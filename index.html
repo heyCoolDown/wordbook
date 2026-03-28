@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="단어연습장">
+  <link rel="manifest" href="manifest.json">
+  <title>🌟 영어 단어 연습장</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --cream:#FFFBF5;--coral:#FF6B6B;--teal:#4ECDC4;--yellow:#FFE66D;
+      --purple:#C084FC;--green:#4ADE80;--blue:#60A5FA;--orange:#FB923C;
+      --text:#2D2D2D;--muted:#9A9A9A;
+      --shadow:0 8px 32px rgba(0,0,0,.09);--r:24px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    body{font-family:'Nunito',sans-serif;background:var(--cream);min-height:100vh;overflow-x:hidden;user-select:none}
+    .bg1{position:fixed;width:420px;height:420px;border-radius:50%;top:-140px;right:-140px;background:radial-gradient(circle,rgba(255,107,107,.10),transparent 70%);pointer-events:none;z-index:0}
+    .bg2{position:fixed;width:420px;height:420px;border-radius:50%;bottom:-140px;left:-140px;background:radial-gradient(circle,rgba(78,205,196,.10),transparent 70%);pointer-events:none;z-index:0}
+
+    .screen{display:none;min-height:100vh;padding:28px 18px 60px;max-width:740px;margin:0 auto;position:relative;z-index:1;flex-direction:column}
+    .screen.active{display:flex}
+
+    .hdr{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+    .back{width:50px;height:50px;border-radius:50%;background:white;border:none;font-size:22px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.09);display:flex;align-items:center;justify-content:center;transition:transform .15s;flex-shrink:0}
+    .back:active{transform:scale(.87)}
+    .hdr-t{font-family:'Fredoka One',cursive;font-size:26px;color:var(--text);flex:1}
+
+    .inp{flex:1;padding:13px 16px;border:2.5px solid #E8E8E8;border-radius:14px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;outline:none;background:var(--cream);color:var(--text);transition:border-color .2s,background .2s}
+    .inp:focus{border-color:var(--coral);background:white}
+
+    .toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(14px);background:rgba(30,30,30,.92);color:white;padding:12px 24px;border-radius:999px;font-family:'Fredoka One',cursive;font-size:16px;opacity:0;transition:opacity .25s,transform .25s;z-index:900;pointer-events:none;white-space:nowrap}
+    .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    #starcanvas{position:fixed;inset:0;pointer-events:none;z-index:800}
+    .star{position:absolute;font-size:30px;animation:starfly 1.4s forwards ease-out}
+    @keyframes starfly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-200px) scale(.3)}}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+    @keyframes fadeup{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+    @keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+    /* ══ HOME ══ */
+    #s-home{align-items:center;justify-content:center;text-align:center;gap:16px}
+    .logo{font-size:84px;animation:bob 2.6s ease-in-out infinite}
+    .app-title{font-family:'Fredoka One',cursive;font-size:42px;line-height:1.1;background:linear-gradient(135deg,var(--coral),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .app-sub{font-size:15px;color:var(--muted);font-weight:700;letter-spacing:1px}
+    .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:500px}
+    .hcard{background:white;border-radius:26px;padding:24px 14px;cursor:pointer;border:none;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:var(--shadow);transition:transform .15s}
+    .hcard:active{transform:scale(.92)}
+    .hcard.ca{background:linear-gradient(135deg,#EDE9FE,#FFF0F9)}
+    .hcard.cb{background:linear-gradient(135deg,#FFF0F0,#FFFBEB)}
+    .hcard.cc{background:linear-gradient(135deg,#E0FDF4,#EFF6FF)}
+    .hcard.cd{background:linear-gradient(135deg,#FEF9C3,#FFF0F0)}
+    .hcard.ce{background:linear-gradient(135deg,#FFF0E8,#FEE2E2)}
+    .hcard.full{grid-column:1/-1}
+    .hc-ico{font-size:48px}.hc-lbl{font-family:'Fredoka One',cursive;font-size:19px;color:var(--text)}.hc-sub{font-size:11px;color:var(--muted);font-weight:700}
+
+    /* ══ FOLDER LIST ══ */
+    .folder-list{display:flex;flex-direction:column;gap:10px}
+    .fcard{background:white;border-radius:20px;padding:15px 17px;display:flex;align-items:center;gap:13px;box-shadow:0 4px 14px rgba(0,0,0,.07);cursor:pointer;border:none;text-align:left;transition:transform .13s;animation:fadeup .2s ease;width:100%}
+    .fcard:active{transform:scale(.95)}
+    .fico{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+    .finfo{flex:1}.fname{font-family:'Fredoka One',cursive;font-size:19px;color:var(--text)}.fcnt{font-size:12px;color:var(--muted);font-weight:700;margin-top:1px}
+    .flabel{font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--coral);color:white;margin-left:6px}
+    .fdel{background:none;border:none;font-size:18px;cursor:pointer;padding:6px;opacity:.55}.fdel:active{opacity:1}
+    .farr{font-size:22px;color:#DDD}
+    .add-folder-btn{background:white;border:3px dashed #D1D5DB;border-radius:20px;padding:16px;text-align:center;cursor:pointer;font-family:'Fredoka One',cursive;font-size:17px;color:var(--muted);margin-top:8px;transition:border-color .2s,color .2s}
+    .add-folder-btn:active{border-color:var(--coral);color:var(--coral)}
+
+    /* ══ DETAIL ══ */
+    .add-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+    .add-btn{background:linear-gradient(135deg,var(--coral),#FF8E53);color:white;border:none;border-radius:14px;padding:13px 17px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;white-space:nowrap;transition:transform .13s}
+    .add-btn:active{transform:scale(.89)}
+    .preview-bar{background:white;border-radius:14px;padding:12px 16px;margin-bottom:12px;display:none;align-items:center;gap:12px;box-shadow:0 3px 10px rgba(0,0,0,.06);animation:fadeup .2s ease}
+    .preview-bar.on{display:flex}
+    .prev-word{font-family:'Fredoka One',cursive;font-size:22px;color:var(--text);flex:1}
+    .prev-ko{font-size:14px;color:var(--muted);font-weight:700}
+    .prev-spk{background:linear-gradient(135deg,#60A5FA,#3B82F6);color:white;border:none;border-radius:999px;padding:8px 16px;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer}
+    .word-list{flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+    .wrow{background:white;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 3px 10px rgba(0,0,0,.06);animation:fadeup .2s ease}
+    .wnum{width:30px;height:30px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0}
+    .wen{font-weight:800;font-size:17px;flex:1}.wko{font-size:13px;color:var(--muted);font-weight:700;min-width:50px}
+    .wemo{font-size:22px;margin-right:2px}
+    .wspk{width:36px;height:36px;background:linear-gradient(135deg,#60A5FA,#3B82F6);border:none;border-radius:50%;color:white;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .13s}
+    .wspk:active{transform:scale(.83)}
+    .wdel{width:34px;height:34px;background:#FFE5E5;border:none;border-radius:50%;color:var(--coral);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .empty{text-align:center;padding:50px 0;color:var(--muted)}.ei{font-size:56px;margin-bottom:12px}.empty p{font-size:16px;font-weight:700}
+
+    /* ══ PICKER ══ */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:flex-end}
+    .overlay.on{display:flex}
+    .sheet{background:white;width:100%;border-radius:30px 30px 0 0;padding:26px 20px 52px;max-height:78vh;overflow-y:auto;animation:slideup .28s ease}
+    .sh-title{font-family:'Fredoka One',cursive;font-size:22px;text-align:center;margin-bottom:16px}
+    .sh-list{display:flex;flex-direction:column;gap:10px}
+    .sh-item{padding:15px 17px;border-radius:16px;cursor:pointer;border:none;display:flex;align-items:center;gap:13px;font-family:'Fredoka One',cursive;font-size:17px;text-align:left;transition:transform .12s;width:100%}
+    .sh-item:active{transform:scale(.95)}
+    .sh-all{background:linear-gradient(135deg,#EDE9FE,#FFF0F9);color:var(--text)}
+    .sh-cancel{margin-top:12px;width:100%;padding:14px;border-radius:16px;background:#F3F4F6;border:none;font-family:'Fredoka One',cursive;font-size:17px;color:var(--muted);cursor:pointer}
+
+    /* ══ FLASHCARD ══ */
+    #s-flash{align-items:center}
+    .progwrap{width:100%;max-width:520px;background:#E8E8E8;border-radius:999px;height:10px;overflow:hidden}
+    .progbar{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--coral),var(--purple));transition:width .4s ease}
+    .proglbl{font-weight:800;font-size:13px;color:var(--muted);margin:6px 0 14px}
+    .fcwrap{width:100%;max-width:520px;perspective:1200px;cursor:pointer;margin:8px 0}
+    .fc{width:100%;height:290px;position:relative;transform-style:preserve-3d;transition:transform .52s cubic-bezier(.4,0,.2,1)}
+    .fc.flipped{transform:rotateY(180deg)}
+    .fc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:30px;box-shadow:0 14px 48px rgba(0,0,0,.13)}
+    .fc-front{background:linear-gradient(135deg,#FF6B6B,#FF8E53)}
+    .fc-back{background:linear-gradient(135deg,#4ECDC4,#2BB5AC);transform:rotateY(180deg)}
+    .fc-word{font-family:'Fredoka One',cursive;font-size:50px;color:white;text-align:center;text-shadow:0 3px 12px rgba(0,0,0,.12)}
+    .fc-sub{font-size:14px;color:rgba(255,255,255,.78);font-weight:700}
+    .fc-emo{font-size:62px}
+    .spkrow{display:flex;gap:8px}
+    .spkbtn{background:rgba(255,255,255,.24);border:2px solid rgba(255,255,255,.48);color:white;border-radius:999px;padding:7px 16px;font-family:'Fredoka One',cursive;font-size:15px;cursor:pointer;transition:background .14s}
+    .spkbtn:active{background:rgba(255,255,255,.46)}
+    .taphint{font-size:13px;color:var(--muted);font-weight:700;animation:blink 2s infinite}
+    .fcnav{display:flex;align-items:center;gap:14px;margin-top:10px}
+    .navbtn{width:62px;height:62px;border-radius:50%;border:none;font-size:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .13s;box-shadow:0 5px 16px rgba(0,0,0,.10)}
+    .navbtn:active{transform:scale(.85)}
+    .navprev{background:white}.navnext{background:linear-gradient(135deg,var(--coral),#FF8E53);color:white}
+    .fccnt{font-family:'Fredoka One',cursive;font-size:18px;color:var(--muted);min-width:76px;text-align:center}
+    .shufflebtn{background:var(--yellow);border:none;border-radius:999px;padding:10px 26px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-top:8px;transition:transform .13s;box-shadow:0 4px 12px rgba(255,230,109,.38)}
+    .shufflebtn:active{transform:scale(.90)}
+
+    /* ══ SPELLING ══ */
+    #s-spell{align-items:center}
+    .scorerow{display:flex;gap:8px;width:100%;max-width:520px;margin-bottom:14px}
+    .scbox{flex:1;background:white;border-radius:16px;padding:11px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.06)}
+    .scn{font-family:'Fredoka One',cursive;font-size:28px}
+    .scn.ok{color:var(--green)}.scn.no{color:var(--coral)}.scn.re{color:var(--blue)}
+    .scl{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px}
+    .spcard{background:white;border-radius:28px;padding:26px 20px;text-align:center;box-shadow:var(--shadow);width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:13px}
+    .sp-emo{font-size:72px}.sp-kor{font-family:'Fredoka One',cursive;font-size:32px}
+    .sp-spk{background:linear-gradient(135deg,#60A5FA,#3B82F6);color:white;border:none;border-radius:999px;padding:8px 20px;font-family:'Fredoka One',cursive;font-size:15px;cursor:pointer;transition:transform .13s}
+    .sp-spk:active{transform:scale(.90)}
+    .lboxes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+    .lb{width:46px;height:54px;border-radius:12px;border:3px solid #E8E8E8;background:var(--cream);display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:24px;transition:border-color .2s,background .2s}
+    .lb.cur{border-color:var(--coral);background:white}
+    .lb.ok{border-color:var(--green);background:#DCFCE7;color:#16A34A}
+    .lb.bad{border-color:var(--coral);background:#FFE5E5;color:var(--coral)}
+    .spinp{width:100%;padding:13px;border:3px solid #E8E8E8;border-radius:16px;font-family:'Fredoka One',cursive;font-size:26px;text-align:center;letter-spacing:7px;outline:none;text-transform:lowercase;background:var(--cream);color:var(--text);transition:border-color .2s,background .2s}
+    .spinp:focus{border-color:var(--teal);background:white}
+    .spinp.ok{border-color:var(--green);background:#DCFCE7}
+    .spinp.bad{border-color:var(--coral);background:#FFE5E5}
+    .resmsg{font-family:'Fredoka One',cursive;font-size:22px;min-height:32px;text-align:center}
+    .resmsg.ok{color:#16A34A}.resmsg.bad{color:var(--coral)}
+    .chkbtn{width:100%;padding:15px;border:none;border-radius:18px;background:linear-gradient(135deg,var(--teal),#2BB5AC);color:white;font-family:'Fredoka One',cursive;font-size:21px;cursor:pointer;transition:transform .13s}
+    .chkbtn:active{transform:scale(.95)}
+    .nxtbtn{width:100%;padding:15px;border:none;border-radius:18px;background:linear-gradient(135deg,var(--purple),#9333EA);color:white;font-family:'Fredoka One',cursive;font-size:21px;cursor:pointer;transition:transform .13s;display:none}
+    .nxtbtn:active{transform:scale(.95)}
+    .rev-tabs{display:flex;gap:8px;width:100%;max-width:520px;margin-bottom:12px}
+    .rtab{flex:1;padding:11px;border:none;border-radius:14px;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;background:#F3F4F6;color:var(--muted);transition:all .15s}
+    .rtab.active{background:var(--coral);color:white}
+    .rtab.tab-ok.active{background:var(--green)}
+    .rtab.tab-no.active{background:var(--coral)}
+    .review-list{display:flex;flex-direction:column;gap:8px;width:100%;max-width:520px}
+    .rv-item{background:white;border-radius:16px;padding:13px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 3px 10px rgba(0,0,0,.06);animation:fadeup .2s ease}
+    .rv-badge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .rv-badge.ok{background:#DCFCE7}.rv-badge.no{background:#FFE5E5}
+    .rv-en{font-weight:800;font-size:17px;flex:1}.rv-ko{font-size:13px;color:var(--muted);font-weight:700}
+
+    /* ══ EXAM ══ */
+    #s-exam{align-items:center}
+    .exam-head{width:100%;max-width:520px;text-align:center;margin-bottom:16px}
+    .exam-prog{font-weight:800;font-size:14px;color:var(--muted);margin-bottom:8px}
+    .exam-list{width:100%;max-width:520px;display:flex;flex-direction:column;gap:10px}
+    .eq{background:white;border-radius:18px;padding:14px 16px;box-shadow:0 3px 12px rgba(0,0,0,.07);animation:fadeup .2s ease}
+    .eq-q{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+    .eq-num{width:32px;height:32px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0}
+    .eq-emo{font-size:28px}.eq-kor{font-family:'Fredoka One',cursive;font-size:20px;flex:1}
+    .eq-spk{width:36px;height:36px;background:linear-gradient(135deg,#60A5FA,#3B82F6);border:none;border-radius:50%;color:white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .eq-inp{width:100%;padding:11px 14px;border:2.5px solid #E8E8E8;border-radius:12px;font-family:'Fredoka One',cursive;font-size:22px;letter-spacing:4px;outline:none;text-transform:lowercase;background:var(--cream);transition:border-color .2s,background .2s;text-align:center}
+    .eq-inp:focus{border-color:var(--teal);background:white}
+    .eq-inp.ok{border-color:var(--green);background:#DCFCE7}
+    .eq-inp.bad{border-color:var(--coral);background:#FFE5E5}
+    .eq-res{font-family:'Fredoka One',cursive;font-size:15px;margin-top:6px;min-height:22px;text-align:center}
+    .eq-res.ok{color:#16A34A}.eq-res.bad{color:var(--coral)}
+    .submit-btn{width:100%;max-width:520px;padding:17px;border:none;border-radius:20px;background:linear-gradient(135deg,var(--orange),var(--coral));color:white;font-family:'Fredoka One',cursive;font-size:23px;cursor:pointer;margin-top:16px;box-shadow:0 8px 24px rgba(251,146,60,.34);transition:transform .14s}
+    .submit-btn:active{transform:scale(.95)}
+    .exam-result{width:100%;max-width:520px}
+    .res-banner{border-radius:26px;padding:28px;text-align:center;color:white;margin-bottom:18px;box-shadow:0 10px 32px rgba(0,0,0,.12)}
+    .rb-s{font-family:'Fredoka One',cursive;font-size:52px;margin-bottom:6px}
+    .rb-t{font-family:'Fredoka One',cursive;font-size:26px}
+    .rb-d{font-size:15px;opacity:.88;font-weight:700;margin-top:4px}
+    .res-actions{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+    .ra-btn{width:100%;padding:15px;border:none;border-radius:18px;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;transition:transform .13s;color:white}
+    .ra-btn:active{transform:scale(.94)}
+    .ra-retry-wrong{background:linear-gradient(135deg,var(--coral),#FF8E53)}
+    .ra-retry-all{background:linear-gradient(135deg,var(--purple),#9333EA)}
+    .ra-home{background:linear-gradient(135deg,var(--teal),#2BB5AC)}
+
+    /* ══ DAILY ══ */
+    #s-daily{align-items:center}
+    .daily-head{width:100%;max-width:520px;background:linear-gradient(135deg,var(--orange),var(--coral));border-radius:26px;padding:24px;text-align:center;color:white;box-shadow:0 10px 30px rgba(251,146,60,.32);margin-bottom:16px}
+    .daily-head h2{font-family:'Fredoka One',cursive;font-size:26px;margin-bottom:4px}
+    .daily-head p{font-size:14px;opacity:.88;font-weight:700}
+    .folder-badge{background:rgba(255,255,255,.25);border-radius:999px;padding:5px 16px;display:inline-block;font-family:'Fredoka One',cursive;font-size:14px;margin-top:8px}
+    .daily-list{display:flex;flex-direction:column;gap:8px;width:100%;max-width:520px}
+    .ditem{background:white;border-radius:16px;padding:12px 15px;display:flex;align-items:center;gap:11px;box-shadow:0 3px 10px rgba(0,0,0,.06);animation:fadeup .2s ease}
+    .dnum{width:32px;height:32px;background:var(--yellow);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0}
+    .den{font-weight:800;font-size:17px;flex:1}.dko{font-size:13px;color:var(--muted);font-weight:700}
+    .dems{font-size:24px}
+    .daily-acts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:520px;margin-top:14px}
+    .share-btn{width:100%;padding:16px;border:none;border-radius:20px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 7px 20px rgba(37,211,102,.30);transition:transform .13s}
+    .share-btn:active{transform:scale(.95)}
+    .copy-btn{width:100%;padding:16px;border:none;border-radius:20px;background:linear-gradient(135deg,#60A5FA,#3B82F6);color:white;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 7px 20px rgba(96,165,250,.28);transition:transform .13s}
+    .copy-btn:active{transform:scale(.95)}
+    .notif-box{background:white;border-radius:20px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.07);width:100%;max-width:520px;margin-top:8px}
+    .notif-t{font-family:'Fredoka One',cursive;font-size:17px;margin-bottom:10px}
+    .notif-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+    .tminp{border:2.5px solid #E8E8E8;border-radius:12px;padding:9px 13px;font-family:'Fredoka One',cursive;font-size:16px;outline:none;background:var(--cream);color:var(--text);width:110px}
+    .tminp:focus{border-color:var(--purple)}
+    .setbtn{background:var(--purple);color:white;border:none;border-radius:12px;padding:9px 16px;font-family:'Fredoka One',cursive;font-size:15px;cursor:pointer;white-space:nowrap}
+    .notif-note{margin-top:9px;font-size:12px;font-weight:700;color:var(--muted);line-height:1.5}
+
+    /* ══ INSTALL BANNER ══ */
+    .install-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,var(--coral),var(--purple));color:white;padding:14px 20px;display:flex;align-items:center;gap:12px;z-index:700;box-shadow:0 -4px 20px rgba(0,0,0,.15)}
+    .install-banner.hidden{display:none}
+    .ib-text{flex:1;font-family:'Fredoka One',cursive;font-size:15px;line-height:1.4}
+    .ib-close{background:rgba(255,255,255,.25);border:none;color:white;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  </style>
+</head>
+<body>
+<div class="bg1"></div><div class="bg2"></div>
+<div id="starcanvas"></div>
+<div class="toast" id="toast"></div>
+
+<!-- iOS 홈화면 추가 안내 배너 -->
+<div class="install-banner hidden" id="install-banner">
+  <div class="ib-text">📱 홈 화면에 추가하면<br>앱처럼 쓸 수 있어요! (공유버튼 → 홈 화면에 추가)</div>
+  <button class="ib-close" onclick="document.getElementById('install-banner').classList.add('hidden')">×</button>
+</div>
+
+<!-- PICKER OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="sheet">
+    <div class="sh-title" id="sh-title">📁 폴더 선택</div>
+    <div class="sh-list" id="sh-list"></div>
+    <button class="sh-cancel" onclick="closePicker()">취소</button>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div class="screen active" id="s-home">
+  <div class="logo">📚</div>
+  <div class="app-title">영어 단어<br>연습장</div>
+  <div class="app-sub">✨ Word Practice Book ✨</div>
+  <div class="home-grid">
+    <button class="hcard ca" onclick="show('folders')">
+      <div class="hc-ico">📁</div><div class="hc-lbl">단어 관리</div><div class="hc-sub">폴더별 입력</div>
+    </button>
+    <button class="hcard cb" onclick="openPicker('flash')">
+      <div class="hc-ico">🃏</div><div class="hc-lbl">플래시카드</div><div class="hc-sub">폴더 선택 후 연습</div>
+    </button>
+    <button class="hcard cc" onclick="openPicker('spell')">
+      <div class="hc-ico">🖊️</div><div class="hc-lbl">철자 연습</div><div class="hc-sub">한 문제씩 연습</div>
+    </button>
+    <button class="hcard ce" onclick="openPicker('exam')">
+      <div class="hc-ico">📝</div><div class="hc-lbl">시험 모드</div><div class="hc-sub">전체 한번에 채점</div>
+    </button>
+    <button class="hcard cd full" onclick="show('daily')">
+      <div class="hc-ico">📅</div><div class="hc-lbl">오늘의 단어</div><div class="hc-sub">이번 주 단어 공유</div>
+    </button>
+  </div>
+</div>
+
+<!-- ══ FOLDER LIST ══ -->
+<div class="screen" id="s-folders">
+  <div class="hdr">
+    <button class="back" onclick="show('home')">←</button>
+    <div class="hdr-t">📁 단어 관리</div>
+  </div>
+  <div class="folder-list" id="folder-list"></div>
+  <button class="add-folder-btn" onclick="promptFolder()">＋ 새 폴더 만들기 (예: 3주차)</button>
+</div>
+
+<!-- ══ FOLDER DETAIL ══ -->
+<div class="screen" id="s-detail">
+  <div class="hdr">
+    <button class="back" onclick="show('folders')">←</button>
+    <div class="hdr-t" id="det-title">단어 입력</div>
+  </div>
+  <div class="add-row">
+    <input class="inp" id="inp-en" placeholder="English" autocorrect="off" autocapitalize="none" spellcheck="false" style="min-width:0">
+    <input class="inp" id="inp-ko" placeholder="한국어" style="max-width:120px;min-width:0">
+    <button class="add-btn" onclick="addWord()">＋</button>
+  </div>
+  <div class="preview-bar" id="preview-bar">
+    <div class="prev-word" id="prev-word"></div>
+    <div class="prev-ko" id="prev-ko"></div>
+    <button class="prev-spk" onclick="speak(document.getElementById('inp-en').value)">🔊 발음 확인</button>
+  </div>
+  <div class="word-list" id="word-list"></div>
+</div>
+
+<!-- ══ FLASHCARD ══ -->
+<div class="screen" id="s-flash">
+  <div class="hdr" style="width:100%;max-width:520px">
+    <button class="back" onclick="show('home')">←</button>
+    <div class="hdr-t" id="f-fname">🃏 플래시카드</div>
+  </div>
+  <div class="progwrap"><div class="progbar" id="fprog"></div></div>
+  <div class="proglbl" id="flbl">1 / 10</div>
+  <div class="fcwrap" onclick="flipCard()">
+    <div class="fc" id="fc">
+      <div class="fc-face fc-front">
+        <div class="fc-word" id="f-word">apple</div>
+        <div class="spkrow"><button class="spkbtn" id="f-spkf">🔊 발음 듣기</button></div>
+        <div class="fc-sub">탭해서 뒤집기 👆</div>
+      </div>
+      <div class="fc-face fc-back">
+        <div class="fc-emo" id="f-emo">🍎</div>
+        <div class="fc-word" id="f-kor">사과</div>
+        <div class="spkrow"><button class="spkbtn" id="f-spkb">🔊 다시 듣기</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="taphint">👆 카드를 탭하면 뒤집어요!</div>
+  <div class="fcnav">
+    <button class="navbtn navprev" onclick="prevCard()">←</button>
+    <div class="fccnt" id="fccnt">1 / 10</div>
+    <button class="navbtn navnext" onclick="nextCard()">→</button>
+  </div>
+  <button class="shufflebtn" onclick="shuffleCards()">🔀 섞기</button>
+</div>
+
+<!-- ══ SPELLING ══ -->
+<div class="screen" id="s-spell">
+  <div class="hdr" style="width:100%;max-width:520px">
+    <button class="back" onclick="show('home')">←</button>
+    <div class="hdr-t" id="sp-fname">🖊️ 철자 연습</div>
+  </div>
+  <div id="spell-main">
+    <div class="scorerow">
+      <div class="scbox"><div class="scn ok" id="sc-ok">0</div><div class="scl">맞음 ✅</div></div>
+      <div class="scbox"><div class="scn no" id="sc-no">0</div><div class="scl">틀림 ❌</div></div>
+      <div class="scbox"><div class="scn re" id="sc-left">0</div><div class="scl">남은 문제</div></div>
+    </div>
+    <div class="spcard">
+      <div class="sp-emo" id="sp-emo">🍎</div>
+      <div class="sp-kor" id="sp-kor">사과</div>
+      <button class="sp-spk" onclick="spkCur()">🔊 발음 듣기</button>
+      <div class="lboxes" id="lboxes"></div>
+      <input class="spinp" id="spinp" placeholder="영어로 써보세요" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none">
+      <div class="resmsg" id="resmsg"></div>
+      <button class="chkbtn" id="chkbtn" onclick="checkSpell()">확인 ✓</button>
+      <button class="nxtbtn" id="nxtbtn" onclick="nextSpell()">다음 문제 →</button>
+    </div>
+  </div>
+  <div id="spell-done" style="display:none">
+    <div class="rev-tabs">
+      <button class="rtab tab-ok" id="rtab-ok" onclick="showRevTab('ok')">✅ 맞은 단어 <span id="rok-cnt"></span></button>
+      <button class="rtab tab-no active" id="rtab-no" onclick="showRevTab('no')">❌ 틀린 단어 <span id="rno-cnt"></span></button>
+    </div>
+    <div class="review-list" id="review-list"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;width:100%;max-width:520px">
+      <button class="chkbtn" onclick="retryWrong()" id="retry-wrong-btn">🔄 틀린 단어만 다시 연습</button>
+      <button class="nxtbtn" style="display:block" onclick="show('home')">🏠 홈으로</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ EXAM ══ -->
+<div class="screen" id="s-exam">
+  <div class="hdr" style="width:100%;max-width:520px">
+    <button class="back" onclick="show('home')">←</button>
+    <div class="hdr-t" id="ex-fname">📝 시험 모드</div>
+  </div>
+  <div id="exam-main">
+    <div class="exam-head">
+      <div class="exam-prog" id="ex-prog">모든 단어를 써보세요!</div>
+      <div class="progwrap" style="max-width:520px"><div class="progbar" id="ex-progbar" style="width:0%"></div></div>
+    </div>
+    <div class="exam-list" id="exam-list"></div>
+    <button class="submit-btn" onclick="submitExam()">📋 채점하기</button>
+  </div>
+  <div id="exam-result" style="display:none">
+    <div class="exam-result">
+      <div class="res-banner" id="res-banner">
+        <div class="rb-s" id="res-score"></div>
+        <div class="rb-t" id="res-msg"></div>
+        <div class="rb-d" id="res-detail"></div>
+      </div>
+      <div class="rev-tabs">
+        <button class="rtab tab-ok" id="ex-rtab-ok" onclick="showExRevTab('ok')">✅ 맞은 단어 <span id="ex-rok-cnt"></span></button>
+        <button class="rtab tab-no active" id="ex-rtab-no" onclick="showExRevTab('no')">❌ 틀린 단어 <span id="ex-rno-cnt"></span></button>
+      </div>
+      <div class="review-list" id="ex-review-list"></div>
+      <div class="res-actions" style="margin-top:16px">
+        <button class="ra-btn ra-retry-wrong" id="ex-retry-wrong" onclick="retryWrongExam()">🔄 틀린 단어만 다시 시험</button>
+        <button class="ra-btn ra-retry-all" onclick="startExamMode(_exWords,document.getElementById('ex-fname').textContent.replace('📝 ',''))">📝 전체 다시 시험</button>
+        <button class="ra-btn ra-home" onclick="show('home')">🏠 홈으로</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DAILY ══ -->
+<div class="screen" id="s-daily">
+  <div class="hdr">
+    <button class="back" onclick="show('home')">←</button>
+    <div class="hdr-t">📅 오늘의 단어</div>
+  </div>
+  <div class="daily-head">
+    <h2 id="daily-date">📅 오늘의 단어</h2>
+    <p>이번 주 단어 5개를 아이에게 공유해보세요! 🌟</p>
+    <div class="folder-badge" id="daily-folder-badge">📁 최근 폴더</div>
+  </div>
+  <div class="daily-list" id="daily-list"></div>
+  <div class="daily-acts">
+    <button class="share-btn" onclick="shareDaily()">💬 카카오톡 · 문자로 보내기</button>
+    <button class="copy-btn" onclick="copyDaily()">📋 텍스트 복사하기</button>
+  </div>
+  <div class="notif-box">
+    <div class="notif-t">⏰ 매일 알림 설정</div>
+    <div class="notif-row">
+      <input type="time" class="tminp" id="notif-time" value="14:00">
+      <button class="setbtn" onclick="setNotif()">알림 설정</button>
+    </div>
+    <div class="notif-note" id="notif-note">⚠️ 앱이 열려있을 때만 알림이 울려요.<br>💡 홈 화면에 추가하면 앱처럼 사용 가능!</div>
+  </div>
+</div>
+
+<script>
+/* ══ DATA ══ */
+const COLORS=[
+  {bg:'#FFE5E5',ac:'#FF6B6B',ico:'🌸'},{bg:'#E0FDF4',ac:'#4ECDC4',ico:'🌿'},
+  {bg:'#EDE9FE',ac:'#C084FC',ico:'🦄'},{bg:'#DBEAFE',ac:'#60A5FA',ico:'⭐'},
+  {bg:'#FEF3C7',ac:'#F59E0B',ico:'🌟'},{bg:'#FCE7F3',ac:'#EC4899',ico:'🌺'},
+  {bg:'#ECFDF5',ac:'#10B981',ico:'🐢'},{bg:'#FFF7ED',ac:'#FB923C',ico:'🦊'},
+];
+const EMOJIS=['🌈','🎈','🎀','🍭','🍦','🦋','🐸','🐬','🦁','🐼','🌺','🍓','🎸','🚀','⚡','🌊','🎪','🦖','🐙','🦕'];
+const KEY='ewrd_v4';
+let D={
+  folders:[
+    {id:1,name:'1주차',ci:0,words:[
+      {id:1,en:'apple',ko:'사과',em:'🍎'},{id:2,en:'ball',ko:'공',em:'⚽'},
+      {id:3,en:'cat',ko:'고양이',em:'🐱'},{id:4,en:'dog',ko:'강아지',em:'🐶'},
+      {id:5,en:'egg',ko:'달걀',em:'🥚'},{id:6,en:'fish',ko:'물고기',em:'🐟'},
+      {id:7,en:'hat',ko:'모자',em:'🎩'},{id:8,en:'kite',ko:'연',em:'🪁'},
+      {id:9,en:'moon',ko:'달',em:'🌙'},{id:10,en:'sun',ko:'태양',em:'☀️'},
+    ]},
+    {id:2,name:'2주차',ci:1,words:[
+      {id:11,en:'bird',ko:'새',em:'🐦'},{id:12,en:'book',ko:'책',em:'📚'},
+      {id:13,en:'cake',ko:'케이크',em:'🎂'},{id:14,en:'duck',ko:'오리',em:'🦆'},
+      {id:15,en:'frog',ko:'개구리',em:'🐸'},{id:16,en:'grape',ko:'포도',em:'🍇'},
+      {id:17,en:'house',ko:'집',em:'🏠'},{id:18,en:'ice',ko:'얼음',em:'🧊'},
+      {id:19,en:'jump',ko:'점프',em:'🏃'},{id:20,en:'key',ko:'열쇠',em:'🗝️'},
+    ]},
+  ],
+  nfid:3,nwid:21,
+};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D));}catch(e){}}
+function load(){try{const s=localStorage.getItem(KEY);if(s)D=JSON.parse(s);}catch(e){}}
+load();
+
+/* ══ NAV / TOAST / TTS ══ */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='folders')renderFolders();
+  if(id==='daily')renderDaily();
+}
+let _tt;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('on'),2400);}
+function speak(txt){
+  if(!txt||!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang='en-US';u.rate=0.82;u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+
+/* ══ FOLDERS ══ */
+function latestFolder(){return D.folders.length?D.folders[D.folders.length-1]:null;}
+function renderFolders(){
+  const el=document.getElementById('folder-list');
+  const latest=latestFolder();
+  el.innerHTML=D.folders.map(f=>{
+    const c=COLORS[f.ci%COLORS.length];
+    const isLatest=latest&&f.id===latest.id;
+    return `<button class="fcard" onclick="openFolder(${f.id})">
+      <div class="fico" style="background:${c.bg};color:${c.ac}">${c.ico}</div>
+      <div class="finfo">
+        <div class="fname">${f.name}${isLatest?'<span class="flabel">이번 주</span>':''}</div>
+        <div class="fcnt">단어 ${f.words.length}개</div>
+      </div>
+      <button class="fdel" onclick="event.stopPropagation();delFolder(${f.id})">🗑️</button>
+      <div class="farr">›</div>
+    </button>`;
+  }).join('');
+}
+function promptFolder(){
+  const n=prompt('새 폴더 이름\n예) 3주차 / 동물 / 색깔');
+  if(!n||!n.trim())return;
+  D.folders.push({id:D.nfid++,name:n.trim(),ci:D.folders.length%COLORS.length,words:[]});
+  save();renderFolders();
+}
+function delFolder(id){
+  const f=D.folders.find(f=>f.id===id);
+  if(!f||!confirm(`"${f.name}" 폴더를 삭제할까요?`))return;
+  D.folders=D.folders.filter(f=>f.id!==id);save();renderFolders();
+}
+
+/* ══ DETAIL ══ */
+let _cFid=null;
+function openFolder(id){
+  _cFid=id;
+  const f=D.folders.find(f=>f.id===id);
+  document.getElementById('det-title').textContent='📁 '+f.name;
+  renderWords();show('detail');
+}
+function renderWords(){
+  const f=D.folders.find(f=>f.id===_cFid);
+  const el=document.getElementById('word-list');
+  if(!f.words.length){el.innerHTML='<div class="empty"><div class="ei">📭</div><p>단어를 추가해보세요!</p></div>';return;}
+  el.innerHTML=f.words.map((w,i)=>`
+    <div class="wrow">
+      <div class="wnum">${i+1}</div>
+      <div style="flex:1"><div class="wen">${w.en}</div><div class="wko">${w.ko}</div></div>
+      <div class="wemo">${w.em}</div>
+      <button class="wspk" onclick="speak('${w.en}')">🔊</button>
+      <button class="wdel" onclick="delWord(${w.id})">×</button>
+    </div>`).join('');
+}
+function addWord(){
+  const en=document.getElementById('inp-en').value.trim().toLowerCase().replace(/[^a-z\-]/g,'');
+  const ko=document.getElementById('inp-ko').value.trim();
+  if(!en||!ko){toast('영어와 한국어 모두 입력해주세요 😊');return;}
+  const f=D.folders.find(f=>f.id===_cFid);
+  if(f.words.some(w=>w.en===en)){toast('이미 있는 단어예요!');return;}
+  f.words.push({id:D.nwid++,en,ko,em:EMOJIS[Math.floor(Math.random()*EMOJIS.length)]});
+  document.getElementById('inp-en').value='';
+  document.getElementById('inp-ko').value='';
+  document.getElementById('preview-bar').classList.remove('on');
+  save();renderWords();speak(en);
+}
+function delWord(wid){
+  const f=D.folders.find(f=>f.id===_cFid);
+  f.words=f.words.filter(w=>w.id!==wid);save();renderWords();
+}
+const inpEn=document.getElementById('inp-en');
+const inpKo=document.getElementById('inp-ko');
+let _pt;
+inpEn.addEventListener('input',()=>{
+  const v=inpEn.value.trim();
+  const bar=document.getElementById('preview-bar');
+  if(v.length>=2){
+    document.getElementById('prev-word').textContent=v.toLowerCase();
+    document.getElementById('prev-ko').textContent=inpKo.value.trim()||'한국어를 입력해주세요';
+    bar.classList.add('on');
+    clearTimeout(_pt);_pt=setTimeout(()=>speak(v),700);
+  }else{bar.classList.remove('on');}
+});
+inpKo.addEventListener('input',()=>{
+  if(document.getElementById('preview-bar').classList.contains('on'))
+    document.getElementById('prev-ko').textContent=inpKo.value.trim()||'한국어를 입력해주세요';
+});
+inpEn.addEventListener('keydown',e=>{if(e.key==='Enter')inpKo.focus();});
+inpKo.addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});
+
+/* ══ PICKER ══ */
+let _pMode='flash';
+function openPicker(mode){
+  const all=D.folders.flatMap(f=>f.words);
+  if(!all.length){toast('단어를 먼저 추가해주세요!');return;}
+  _pMode=mode;
+  const icon=mode==='flash'?'🃏':mode==='exam'?'📝':'🖊️';
+  const label=mode==='flash'?'플래시카드':mode==='exam'?'시험 모드':'철자 연습';
+  document.getElementById('sh-title').textContent=`${icon} ${label} — 폴더 선택`;
+  document.getElementById('sh-list').innerHTML=`
+    <button class="sh-item sh-all" onclick="startMode('all')">
+      <span style="font-size:24px">📚</span><span>전체 단어 (${all.length}개)</span>
+    </button>
+    ${D.folders.map(f=>{const c=COLORS[f.ci%COLORS.length];const lf=latestFolder();return`
+    <button class="sh-item" style="background:${c.bg}" onclick="startMode(${f.id})">
+      <span style="font-size:24px">${c.ico}</span>
+      <span style="color:var(--text)">${f.name}${lf&&f.id===lf.id?' 🔖':''} <span style="color:var(--muted);font-size:13px">(${f.words.length}개)</span></span>
+    </button>`;}).join('')}`;
+  document.getElementById('overlay').classList.add('on');
+}
+function closePicker(){document.getElementById('overlay').classList.remove('on');}
+function startMode(fid){
+  closePicker();
+  let words,label;
+  if(fid==='all'){words=D.folders.flatMap(f=>f.words);label='전체 단어';}
+  else{const f=D.folders.find(f=>f.id===fid);words=f.words;label=f.name;}
+  if(!words.length){toast('이 폴더에 단어가 없어요!');return;}
+  if(_pMode==='flash')startFlash(words,label);
+  else if(_pMode==='spell')startSpell(words,label);
+  else startExamMode(words,label);
+}
+
+/* ══ FLASHCARD ══ */
+let _fc=[],_fi=0,_fcWord='';
+function startFlash(words,label){
+  _fc=[...words];_fi=0;
+  document.getElementById('f-fname').textContent='🃏 '+label;
+  show('flash');renderFC();
+}
+function renderFC(){
+  const w=_fc[_fi];_fcWord=w.en;
+  document.getElementById('f-word').textContent=w.en;
+  document.getElementById('f-emo').textContent=w.em;
+  document.getElementById('f-kor').textContent=w.ko;
+  document.getElementById('fccnt').textContent=`${_fi+1} / ${_fc.length}`;
+  document.getElementById('fprog').style.width=`${(_fi+1)/_fc.length*100}%`;
+  document.getElementById('flbl').textContent=`${_fi+1} / ${_fc.length}`;
+  document.getElementById('fc').classList.remove('flipped');
+  speak(w.en);
+}
+function flipCard(){document.getElementById('fc').classList.toggle('flipped');}
+function nextCard(){if(_fi<_fc.length-1){_fi++;renderFC();}}
+function prevCard(){if(_fi>0){_fi--;renderFC();}}
+function shuffleCards(){
+  for(let i=_fc.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[_fc[i],_fc[j]]=[_fc[j],_fc[i]];}
+  _fi=0;renderFC();toast('🔀 섞었어요!');
+}
+document.getElementById('f-spkf').addEventListener('click',e=>{e.stopPropagation();speak(_fcWord);});
+document.getElementById('f-spkb').addEventListener('click',e=>{e.stopPropagation();speak(_fcWord);});
+
+/* ══ SPELLING ══ */
+let _sp=[],_si=0,_sok=0,_sno=0,_sdone=false,_spAll=[],_sokW=[],_snoW=[];
+function startSpell(words,label){
+  _spAll=words;_sp=[...words].sort(()=>Math.random()-.5);
+  _si=_sok=_sno=0;_sdone=false;_sokW=[];_snoW=[];
+  document.getElementById('sp-fname').textContent='🖊️ '+label;
+  document.getElementById('spell-main').style.display='';
+  document.getElementById('spell-done').style.display='none';
+  show('spell');renderSpell();
+}
+function renderSpell(){
+  const w=_sp[_si];
+  document.getElementById('sp-emo').textContent=w.em;
+  document.getElementById('sp-kor').textContent=w.ko;
+  const inp=document.getElementById('spinp');
+  inp.value='';inp.className='spinp';inp.disabled=false;
+  document.getElementById('resmsg').textContent='';document.getElementById('resmsg').className='resmsg';
+  document.getElementById('chkbtn').style.display='';
+  document.getElementById('nxtbtn').style.display='none';
+  document.getElementById('lboxes').innerHTML=w.en.split('').map(()=>'<div class="lb"></div>').join('');
+  updScores();_sdone=false;
+  inp.oninput=()=>updLB(w.en);
+  inp.onkeydown=e=>{if(e.key==='Enter')_sdone?nextSpell():checkSpell();};
+  setTimeout(()=>inp.focus(),150);
+}
+function updLB(word){
+  const v=document.getElementById('spinp').value.toLowerCase();
+  document.querySelectorAll('#s-spell .lb').forEach((b,i)=>{b.textContent=v[i]||'';b.className='lb'+(i===v.length?' cur':'');});
+}
+function updScores(){
+  document.getElementById('sc-ok').textContent=_sok;
+  document.getElementById('sc-no').textContent=_sno;
+  document.getElementById('sc-left').textContent=_sp.length-_si;
+}
+function checkSpell(){
+  if(_sdone)return;
+  const w=_sp[_si],inp=document.getElementById('spinp'),val=inp.value.trim().toLowerCase();
+  const res=document.getElementById('resmsg'),boxes=document.querySelectorAll('#s-spell .lb');
+  _sdone=true;inp.disabled=true;
+  w.en.split('').forEach((ch,i)=>{boxes[i].textContent=ch;boxes[i].className='lb '+(val[i]===ch?'ok':'bad');});
+  if(val===w.en){_sok++;_sokW.push(w);inp.className='spinp ok';res.textContent='🎉 정답이에요!';res.className='resmsg ok';speak(w.en);spawnStars();}
+  else{_sno++;_snoW.push(w);inp.className='spinp bad';res.textContent=`❌ 정답: "${w.en}"`;res.className='resmsg bad';}
+  document.getElementById('chkbtn').style.display='none';
+  document.getElementById('nxtbtn').style.display='';
+  updScores();
+}
+function nextSpell(){_si++;if(_si>=_sp.length)showSpellDone();else renderSpell();}
+function showSpellDone(){
+  document.getElementById('spell-main').style.display='none';
+  document.getElementById('spell-done').style.display='';
+  document.getElementById('rok-cnt').textContent=_sokW.length;
+  document.getElementById('rno-cnt').textContent=_snoW.length;
+  document.getElementById('retry-wrong-btn').style.display=_snoW.length?'':'none';
+  showRevTab('no');
+  if(_sok===_sp.length)spawnStars(22);
+}
+let _revTab='no';
+function showRevTab(tab){
+  _revTab=tab;
+  document.getElementById('rtab-ok').classList.toggle('active',tab==='ok');
+  document.getElementById('rtab-no').classList.toggle('active',tab==='no');
+  const list=tab==='ok'?_sokW:_snoW;
+  document.getElementById('review-list').innerHTML=list.length
+    ?list.map(w=>`<div class="rv-item"><div class="rv-badge ${tab}">${tab==='ok'?'✅':'❌'}</div><div style="flex:1"><div class="rv-en">${w.en}</div><div class="rv-ko">${w.ko}</div></div><div style="font-size:22px">${w.em}</div><button class="wspk" onclick="speak('${w.en}')">🔊</button></div>`).join('')
+    :`<div class="empty"><div class="ei">${tab==='ok'?'😅':'🎉'}</div><p>${tab==='ok'?'아직 맞은 단어가 없어요':'틀린 단어가 없어요!'}</p></div>`;
+}
+function retryWrong(){if(_snoW.length)startSpell(_snoW,document.getElementById('sp-fname').textContent.replace('🖊️ ','')+' (재시도)');}
+function spkCur(){if(_sp.length&&_si<_sp.length)speak(_sp[_si].en);}
+
+/* ══ EXAM ══ */
+let _exWords=[];
+function startExamMode(words,label){
+  _exWords=[...words].sort(()=>Math.random()-.5);
+  document.getElementById('ex-fname').textContent='📝 '+label;
+  document.getElementById('exam-main').style.display='';
+  document.getElementById('exam-result').style.display='none';
+  show('exam');buildExam();
+}
+function buildExam(){
+  document.getElementById('ex-prog').textContent=`${_exWords.length}개 단어를 모두 써보세요!`;
+  document.getElementById('ex-progbar').style.width='0%';
+  document.getElementById('exam-list').innerHTML=_exWords.map((w,i)=>`
+    <div class="eq" id="eq-${i}">
+      <div class="eq-q">
+        <div class="eq-num">${i+1}</div>
+        <div class="eq-emo">${w.em}</div>
+        <div class="eq-kor">${w.ko}</div>
+        <button class="eq-spk" onclick="speak('${w.en}')">🔊</button>
+      </div>
+      <input class="eq-inp" id="ei-${i}" placeholder="영어로 써보세요"
+        autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none"
+        oninput="updExProg()"
+        onkeydown="if(event.key==='Enter'){document.getElementById('ei-${Math.min(i+1,_exWords.length-1)}').focus();}">
+      <div class="eq-res" id="er-${i}"></div>
+    </div>`).join('');
+  setTimeout(()=>document.getElementById('ei-0')&&document.getElementById('ei-0').focus(),180);
+}
+function updExProg(){
+  const filled=_exWords.filter((_,i)=>document.getElementById(`ei-${i}`)?.value.trim()).length;
+  document.getElementById('ex-progbar').style.width=`${filled/_exWords.length*100}%`;
+}
+function submitExam(){
+  let ok=0,no=0,okW=[],noW=[];
+  _exWords.forEach((w,i)=>{
+    const inp=document.getElementById(`ei-${i}`),res=document.getElementById(`er-${i}`);
+    const val=inp.value.trim().toLowerCase();
+    inp.disabled=true;
+    if(val===w.en){ok++;okW.push(w);inp.className='eq-inp ok';res.textContent='✅ 정답!';res.className='eq-res ok';}
+    else{no++;noW.push({...w,wrong:val});inp.className='eq-inp bad';res.textContent=`❌ 정답: ${w.en}`;res.className='eq-res bad';}
+  });
+  showExResult(ok,no,okW,noW);
+}
+function showExResult(ok,no,okW,noW){
+  document.getElementById('exam-main').style.display='none';
+  document.getElementById('exam-result').style.display='';
+  const tot=ok+no,pct=Math.round(ok/tot*100);
+  const banner=document.getElementById('res-banner');
+  if(pct>=90)banner.style.background='linear-gradient(135deg,#4ADE80,#10B981)';
+  else if(pct>=70)banner.style.background='linear-gradient(135deg,#60A5FA,#3B82F6)';
+  else if(pct>=50)banner.style.background='linear-gradient(135deg,#FB923C,#F59E0B)';
+  else banner.style.background='linear-gradient(135deg,#FF6B6B,#FF8E53)';
+  document.getElementById('res-score').textContent=`${pct}점`;
+  document.getElementById('res-msg').textContent=pct>=90?'🌟 완벽해요!':pct>=70?'👍 잘했어요!':pct>=50?'💪 조금만 더!':'🔄 다시 도전!';
+  document.getElementById('res-detail').textContent=`${tot}문제 중 ${ok}개 정답 / ${no}개 오답`;
+  document.getElementById('ex-rok-cnt').textContent=ok;
+  document.getElementById('ex-rno-cnt').textContent=no;
+  document.getElementById('ex-retry-wrong').style.display=no?'':'none';
+  window._exOkW=okW;window._exNoW=noW;
+  showExRevTab('no');
+  if(ok===tot)spawnStars(26);else spawnStars(ok*2);
+}
+function showExRevTab(tab){
+  document.getElementById('ex-rtab-ok').classList.toggle('active',tab==='ok');
+  document.getElementById('ex-rtab-no').classList.toggle('active',tab==='no');
+  const list=tab==='ok'?window._exOkW:(window._exNoW||[]);
+  document.getElementById('ex-review-list').innerHTML=list.length
+    ?list.map(w=>`<div class="rv-item"><div class="rv-badge ${tab}">${tab==='ok'?'✅':'❌'}</div><div style="flex:1"><div class="rv-en">${w.en}</div><div class="rv-ko">${w.ko}${w.wrong?` <span style="color:var(--coral);font-size:12px">(내가 쓴 것: ${w.wrong})</span>`:''}</div></div><button class="wspk" onclick="speak('${w.en}')">🔊</button></div>`).join('')
+    :`<div class="empty"><div class="ei">${tab==='ok'?'😅':'🎉'}</div><p>${tab==='ok'?'아직 맞은 단어가 없어요':'틀린 단어가 없어요!'}</p></div>`;
+}
+function retryWrongExam(){
+  if(window._exNoW&&window._exNoW.length)
+    startExamMode(window._exNoW,document.getElementById('ex-fname').textContent.replace('📝 ','')+' (재시도)');
+}
+
+/* ══ DAILY ══ */
+let _daily=[];
+function renderDaily(){
+  const now=new Date();
+  document.getElementById('daily-date').textContent=`📅 ${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
+  const lf=latestFolder();
+  if(!lf||!lf.words.length){
+    document.getElementById('daily-list').innerHTML='<div class="empty"><div class="ei">📭</div><p>단어를 먼저 추가해주세요!</p></div>';
+    document.getElementById('daily-folder-badge').textContent='📁 없음';
+    return;
+  }
+  document.getElementById('daily-folder-badge').textContent=`📁 ${lf.name}`;
+  const seed=now.getFullYear()*10000+(now.getMonth()+1)*100+now.getDate();
+  _daily=seedShuffle([...lf.words],seed).slice(0,Math.min(5,lf.words.length));
+  document.getElementById('daily-list').innerHTML=_daily.map((w,i)=>`
+    <div class="ditem">
+      <div class="dnum">${i+1}</div>
+      <div style="flex:1"><div class="den">${w.en}</div><div class="dko">${w.ko}</div></div>
+      <div class="dems">${w.em}</div>
+      <button class="wspk" onclick="speak('${w.en}')">🔊</button>
+    </div>`).join('');
+}
+function seedShuffle(arr,seed){
+  let s=seed;
+  return arr.map(v=>({v,k:(s=(s*9301+49297)%233280)/233280})).sort((a,b)=>a.k-b.k).map(x=>x.v);
+}
+function buildText(){
+  const now=new Date(),d=`${now.getMonth()+1}월 ${now.getDate()}일`;
+  const lf=latestFolder();
+  let t=`📚 ${d} 오늘의 영어 단어! (${lf?lf.name:''})\n\n`;
+  _daily.forEach((w,i)=>{t+=`${i+1}. ${w.en} — ${w.ko} ${w.em}\n`;});
+  t+='\n✨ 오늘도 열심히 공부해요! 화이팅! 💪';
+  return t;
+}
+function shareDaily(){
+  if(!_daily.length){toast('단어를 먼저 추가해주세요!');return;}
+  const txt=buildText();
+  if(navigator.share){navigator.share({title:'오늘의 영어 단어',text:txt}).catch(()=>{});}
+  else{copyText(txt);toast('📋 복사됐어요! 카카오톡에 붙여넣기 하세요');}
+}
+function copyDaily(){
+  if(!_daily.length){toast('단어를 먼저 추가해주세요!');return;}
+  copyText(buildText());toast('📋 클립보드에 복사됐어요!');
+}
+function copyText(txt){
+  if(navigator.clipboard){navigator.clipboard.writeText(txt).catch(()=>{});return;}
+  const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+}
+
+/* ══ NOTIFICATION ══ */
+let _ntTimer=null;
+function setNotif(){
+  const v=document.getElementById('notif-time').value;
+  const[h,m]=v.split(':').map(Number);
+  function sched(){const now=new Date(),next=new Date();next.setHours(h,m,0,0);if(next<=now)next.setDate(next.getDate()+1);clearTimeout(_ntTimer);_ntTimer=setTimeout(()=>{fireNotif();sched();},next-now);}
+  if('Notification' in window){
+    Notification.requestPermission().then(p=>{
+      sched();
+      document.getElementById('notif-note').textContent=p==='granted'
+        ?`✅ 매일 ${h}시 ${m}분 알림 설정!`:`⚠️ 알림 권한이 없어요.`;
+    });
+  }else{sched();}
+  try{localStorage.setItem('ewrd_notif',v);}catch(e){}
+  toast(`⏰ ${h}시 ${m}분 알림 설정 완료!`);
+}
+function fireNotif(){
+  const lines=_daily.length?_daily.map(w=>`${w.en} — ${w.ko} ${w.em}`).join('\n'):'단어를 추가해주세요!';
+  if(typeof Notification!=='undefined'&&Notification.permission==='granted')
+    new Notification('📚 오늘의 영어 단어!',{body:lines});
+  alert('📚 오늘의 영어 단어!\n\n'+lines+'\n\n✨ 화이팅!');
+}
+try{const sv=localStorage.getItem('ewrd_notif');if(sv){document.getElementById('notif-time').value=sv;const[h,m]=sv.split(':').map(Number);(function sched(){const now=new Date(),next=new Date();next.setHours(h,m,0,0);if(next<=now)next.setDate(next.getDate()+1);clearTimeout(_ntTimer);_ntTimer=setTimeout(()=>{fireNotif();sched();},next-now);})();}}catch(e){}
+
+/* ══ STARS ══ */
+function spawnStars(n=10){
+  const c=document.getElementById('starcanvas'),set=['⭐','🌟','✨','💫','🎉','🎊'];
+  for(let i=0;i<n;i++){
+    const s=document.createElement('div');s.className='star';
+    s.textContent=set[Math.floor(Math.random()*set.length)];
+    s.style.left=(4+Math.random()*88)+'vw';s.style.top=(25+Math.random()*46)+'vh';
+    s.style.animationDelay=(Math.random()*.52)+'s';
+    c.appendChild(s);setTimeout(()=>s.remove(),1900);
+  }
+}
+
+/* ══ PWA / SERVICE WORKER ══ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js')
+      .then(()=>console.log('SW registered'))
+      .catch(e=>console.log('SW error',e));
+  });
+}
+// iOS 홈화면 추가 안내 (Safari에서 처음 열었을 때만)
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone=window.navigator.standalone;
+const shown=localStorage.getItem('install_shown');
+if(isIOS&&!isStandalone&&!shown){
+  document.getElementById('install-banner').classList.remove('hidden');
+  localStorage.setItem('install_shown','1');
+}
+</script>
+</body>
+</html>
