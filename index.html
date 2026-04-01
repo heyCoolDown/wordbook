@@ -324,8 +324,8 @@
   <div class="hdr"><button class="back" id="back-daily">←</button><div class="hdr-t">📅 오늘의 단어</div></div>
   <div class="daily-head">
     <h2 id="daily-date">📅 오늘의 단어</h2>
-    <p>이번 주 단어 5개를 아이에게 공유해보세요! 🌟</p>
-    <div class="folder-badge" id="daily-folder-badge">📁 최근 폴더</div>
+    <p>폴더를 선택하고 카톡으로 공유해보세요! 🌟</p>
+    <button class="folder-badge" id="daily-folder-badge" style="cursor:pointer;border:none;">📁 폴더 선택 ▾</button>
   </div>
   <div class="daily-list" id="daily-list"></div>
   <div class="daily-acts">
@@ -492,16 +492,39 @@ function showExRevTab(tab){
   $('ex-review-list').querySelectorAll('.wspk').forEach(b=>b.addEventListener('click',()=>speak(b.dataset.en)));
 }
 
+let _dailyFid = null; // 선택된 폴더 id (null이면 최근 폴더)
+
 function renderDaily(){
   const now=new Date();$('daily-date').textContent=`📅 ${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일`;
-  const lf=latestFolder();if(!lf||!lf.words.length){$('daily-list').innerHTML='<div class="empty"><div class="ei">📭</div><p>단어를 먼저 추가해주세요!</p></div>';$('daily-folder-badge').textContent='📁 없음';return;}
-  $('daily-folder-badge').textContent=`📁 ${lf.name}`;
-  let s=now.getFullYear()*10000+(now.getMonth()+1)*100+now.getDate();
-  _daily=[...lf.words].map(v=>({v,k:(s=(s*9301+49297)%233280)/233280})).sort((a,b)=>a.k-b.k).map(x=>x.v).slice(0,Math.min(5,lf.words.length));
+  // 선택된 폴더 또는 최근 폴더
+  const f = _dailyFid ? D.folders.find(f=>f.id===_dailyFid) : latestFolder();
+  if(!f||!f.words.length){$('daily-list').innerHTML='<div class="empty"><div class="ei">📭</div><p>단어를 먼저 추가해주세요!</p></div>';$('daily-folder-badge').textContent='📁 없음';return;}
+  $('daily-folder-badge').textContent=`📁 ${f.name} (${f.words.length}개)`;
+  // 5개 제한 없이 폴더 내 전체 단어 표시
+  _daily=[...f.words];
   $('daily-list').innerHTML=_daily.map((w,i)=>`<div class="ditem"><div class="dnum">${i+1}</div><div style="flex:1"><div class="den">${w.en}</div><div class="dko">${w.ko}</div></div><div class="dems">${w.em}</div><button class="wspk" data-en="${w.en}">🔊</button></div>`).join('');
   $('daily-list').querySelectorAll('.wspk').forEach(b=>b.addEventListener('click',()=>speak(b.dataset.en)));
 }
-function buildText(){const now=new Date(),lf=latestFolder();let t=`📚 ${now.getMonth()+1}월 ${now.getDate()}일 오늘의 영어 단어! (${lf?lf.name:''})\n\n`;_daily.forEach((w,i)=>{t+=`${i+1}. ${w.en} — ${w.ko} ${w.em}\n`;});t+='\n✨ 오늘도 열심히 공부해요! 화이팅! 💪';return t;}
+function openDailyPicker(){
+  if(!D.folders.length){toast('폴더를 먼저 만들어주세요!');return;}
+  $('sh-title').textContent='📅 어떤 폴더를 공유할까요?';
+  const lf=latestFolder();
+  $('sh-list').innerHTML=D.folders.map(f=>{const c=COLORS[f.ci%COLORS.length];return`<button class="sh-item" style="background:${c.bg}" data-fid="${f.id}"><span style="font-size:24px">${c.ico}</span><span style="color:var(--text)">${f.name}${lf&&f.id===lf.id?' 🔖':''} <span style="color:var(--muted);font-size:13px">(${f.words.length}개)</span></span></button>`;}).join('');
+  $('sh-list').querySelectorAll('.sh-item').forEach(b=>b.addEventListener('click',()=>{
+    _dailyFid=+b.dataset.fid;
+    $('overlay').classList.remove('on');
+    renderDaily();
+  }));
+  $('overlay').classList.add('on');
+}
+function buildText(){
+  const now=new Date();
+  const f = _dailyFid ? D.folders.find(f=>f.id===_dailyFid) : latestFolder();
+  let t=`📚 ${now.getMonth()+1}월 ${now.getDate()}일 이번 주 영어 단어 (${f?f.name:''})\n\n`;
+  _daily.forEach((w,i)=>{t+=`${i+1}. ${w.en} — ${w.ko} ${w.em}\n`;});
+  t+='\n✨ 열심히 공부해요! 화이팅! 💪';
+  return t;
+}
 function copyText(txt){if(navigator.clipboard){navigator.clipboard.writeText(txt).catch(()=>{});return;}const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}
 
 function setNotif(){
@@ -536,8 +559,9 @@ function setupEvents(){
   $('ex-retry-wrong').onclick=()=>{if(_exNoW.length)startExam(_exNoW,$('ex-fname').textContent.replace('📝 ','')+' (재시도)');};
   $('ex-retry-all').onclick=()=>startExam(_exWords,$('ex-fname').textContent.replace('📝 ',''));
   $('ex-home-btn').onclick=()=>show('home');
-  $('share-btn').onclick=()=>{if(!_daily.length){toast('단어를 먼저 추가해주세요!');return;}const txt=buildText();if(navigator.share)navigator.share({title:'오늘의 영어 단어',text:txt}).catch(()=>{});else{copyText(txt);toast('📋 복사됐어요!');}};
+  $('share-btn').onclick=()=>{if(!_daily.length){toast('단어를 먼저 추가해주세요!');return;}const txt=buildText();if(navigator.share)navigator.share({title:'이번 주 영어 단어',text:txt}).catch(()=>{});else{copyText(txt);toast('📋 복사됐어요!');}};
   $('copy-btn').onclick=()=>{if(!_daily.length){toast('단어를 먼저 추가해주세요!');return;}copyText(buildText());toast('📋 클립보드에 복사됐어요!');};
+  $('daily-folder-badge').onclick=openDailyPicker;;
   $('setbtn').onclick=setNotif;
   $('sh-cancel').onclick=()=>$('overlay').classList.remove('on');
   $('ib-close-btn').onclick=()=>$('install-banner').classList.add('hidden');
