@@ -14,6 +14,7 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // 네트워크 우선 전략 - 항상 최신 파일을 먼저 가져오고 실패하면 캐시 사용
   e.respondWith(
     fetch(e.request)
       .then(res => {
