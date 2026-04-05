@@ -506,9 +506,7 @@ const db=getFirestore(fbApp),REF=doc(db,'wordbook','data');
 
 const COLORS=[{bg:'#FFE5E5',ac:'#FF6B6B',ico:'🌸'},{bg:'#E0FDF4',ac:'#4ECDC4',ico:'🌿'},{bg:'#EDE9FE',ac:'#C084FC',ico:'🦄'},{bg:'#DBEAFE',ac:'#60A5FA',ico:'⭐'},{bg:'#FEF3C7',ac:'#F59E0B',ico:'🌟'},{bg:'#FCE7F3',ac:'#EC4899',ico:'🌺'},{bg:'#ECFDF5',ac:'#10B981',ico:'🐢'},{bg:'#FFF7ED',ac:'#FB923C',ico:'🦊'}];
 const EMOJIS=['🌈','🎈','🎀','🍭','🍦','🦋','🐸','🐬','🦁','🐼','🌺','🍓','🎸','🚀','⚡','🌊','🎪','🦖','🐙','🦕'];
-const DEF={folders:[{id:1,name:'1주차',ci:0,words:[{id:1,en:'apple',ko:'사과',em:'🍎'},{id:2,en:'ball',ko:'공',em:'⚽'},{id:3,en:'cat',ko:'고양이',em:'🐱'},{id:4,en:'dog',ko:'강아지',em:'🐶'},{id:5,en:'egg',ko:'달걀',em:'🥚'},{id:6,en:'fish',ko:'물고기',em:'🐟'},{id:7,en:'hat',ko:'모자',em:'🎩'},{id:8,en:'kite',ko:'연',em:'🪁'},{id:9,en:'moon',ko:'달',em:'🌙'},{id:10,en:'sun',ko:'태양',em:'☀️'}]},{id:2,name:'2주차',ci:1,words:[{id:11,en:'bird',ko:'새',em:'🐦'},{id:12,en:'book',ko:'책',em:'📚'},{id:13,en:'cake',ko:'케이크',em:'🎂'},{id:14,en:'duck',ko:'오리',em:'🦆'},{id:15,en:'frog',ko:'개구리',em:'🐸'},{id:16,en:'grape',ko:'포도',em:'🍇'},{id:17,en:'house',ko:'집',em:'🏠'},{id:18,en:'ice',ko:'얼음',em:'🧊'},{id:19,en:'jump',ko:'점프',em:'🏃'},{id:20,en:'key',ko:'열쇠',em:'🗝️'}]}],nfid:3,nwid:21};
-
-let D=JSON.parse(JSON.stringify(DEF));
+let D={folders:[],nfid:1,nwid:1};
 let _saving=false,_ntTimer=null,_cFid=null,_pMode='flash';
 let _fc=[],_fi=0,_fcWord='';
 let _sp=[],_si=0,_sok=0,_sno=0,_sdone=false,_spAll=[],_sokW=[],_snoW=[];
@@ -530,8 +528,23 @@ function startSync(){
   },()=>syncBadge('err'));
 }
 async function init(){
-  try{const snap=await getDoc(REF);if(snap.exists())D=snap.data();else await setDoc(REF,JSON.parse(JSON.stringify(D)));syncBadge('ok');}catch(e){syncBadge('err');}
-  $('loading').style.display='none';startSync();setupEvents();
+  try{
+    const snap=await getDoc(REF);
+    if(snap.exists()){
+      D=snap.data();  // Firebase에 데이터 있으면 그대로 사용
+    } else {
+      // Firebase가 비어있으면 빈 단어장으로 시작 (샘플 데이터 자동 업로드 안 함)
+      D={folders:[],nfid:1,nwid:1};
+    }
+    syncBadge('ok');
+  }catch(e){
+    // 오프라인이면 빈 단어장으로 시작
+    D={folders:[],nfid:1,nwid:1};
+    syncBadge('err');
+  }
+  $('loading').style.display='none';
+  startSync();
+  setupEvents();
 }
 
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('s-'+id).classList.add('active');window.scrollTo(0,0);if(id==='folders')renderFolders();if(id==='daily')renderDaily();}
