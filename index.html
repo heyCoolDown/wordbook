@@ -163,6 +163,53 @@
     .ib-close{background:rgba(255,255,255,.25);border:none;color:white;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .sync-badge{position:fixed;top:16px;right:16px;background:white;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:800;color:var(--muted);box-shadow:0 2px 8px rgba(0,0,0,.10);z-index:600;transition:all .3s}
     .sync-badge.ok{color:var(--green)}.sync-badge.err{color:var(--coral)}
+    /* ══ GAME ══ */
+    #s-game{align-items:center}
+    .game-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:500px;margin-top:8px}
+    .gcard{border-radius:24px;padding:24px 14px;cursor:pointer;border:none;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:var(--shadow);transition:transform .15s}
+    .gcard:active{transform:scale(.91)}
+    .gc-ico{font-size:52px}.gc-lbl{font-family:'Fredoka One',cursive;font-size:19px;color:var(--text)}.gc-sub{font-size:11px;color:var(--muted);font-weight:700}
+    /* quiz */
+    #s-quiz{align-items:center}
+    .quiz-card{background:white;border-radius:28px;padding:28px 22px;text-align:center;box-shadow:var(--shadow);width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:16px}
+    .quiz-emo{font-size:80px}.quiz-q{font-family:'Fredoka One',cursive;font-size:28px;color:var(--text)}
+    .quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+    .qopt{padding:16px;border:3px solid #E8E8E8;border-radius:16px;background:var(--cream);font-family:'Fredoka One',cursive;font-size:18px;cursor:pointer;transition:all .15s;color:var(--text)}
+    .qopt:active{transform:scale(.94)}.qopt.correct{border-color:var(--green);background:#DCFCE7;color:#16A34A}
+    .qopt.wrong{border-color:var(--coral);background:#FFE5E5;color:var(--coral)}
+    .quiz-score{font-family:'Fredoka One',cursive;font-size:20px;color:var(--muted)}
+    /* match */
+    #s-match{align-items:center}
+    .match-info{display:flex;gap:16px;width:100%;max-width:520px;margin-bottom:12px}
+    .match-stat{flex:1;background:white;border-radius:14px;padding:10px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.06)}
+    .match-stat-n{font-family:'Fredoka One',cursive;font-size:26px}.match-stat-l{font-size:12px;color:var(--muted);font-weight:700}
+    .match-grid{display:grid;gap:8px;width:100%;max-width:520px}
+    .mcard{background:white;border-radius:14px;padding:14px;text-align:center;cursor:pointer;border:3px solid #E8E8E8;font-family:'Fredoka One',cursive;font-size:18px;transition:all .2s;min-height:56px;display:flex;align-items:center;justify-content:center;color:var(--text)}
+    .mcard:active{transform:scale(.94)}.mcard.flipped{background:linear-gradient(135deg,var(--purple),#9333EA);color:white;border-color:var(--purple)}
+    .mcard.matched{background:linear-gradient(135deg,var(--green),#10B981);color:white;border-color:var(--green);cursor:default}
+    .mcard.wrong-flash{background:#FFE5E5;border-color:var(--coral)}
+    /* catch */
+    #s-catch{align-items:center}
+    .catch-wrap{position:relative;width:100%;max-width:520px;height:420px;background:white;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+    .catch-word{position:absolute;font-family:'Fredoka One',cursive;font-size:22px;cursor:pointer;padding:8px 16px;border-radius:999px;border:3px solid;transition:transform .1s;user-select:none}
+    .catch-word:active{transform:scale(.88)}
+    .catch-ko{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);font-family:'Fredoka One',cursive;font-size:28px;color:var(--text);white-space:nowrap;text-align:center}
+    .catch-lives{display:flex;gap:6px;margin-bottom:10px}
+    .catch-hud{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:520px;margin-bottom:8px}
+    .catch-score-lbl{font-family:'Fredoka One',cursive;font-size:20px;color:var(--text)}
+    /* star */
+    #s-star{align-items:center}
+    .star-hud{width:100%;max-width:520px;background:white;border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+    .star-count{font-family:'Fredoka One',cursive;font-size:36px;color:var(--yellow);text-shadow:0 2px 8px rgba(255,230,109,.5)}
+    .star-lv{font-family:'Fredoka One',cursive;font-size:18px;color:var(--purple)}
+    .star-card{background:white;border-radius:28px;padding:26px 20px;text-align:center;box-shadow:var(--shadow);width:100%;max-width:520px;display:flex;flex-direction:column;align-items:center;gap:14px}
+    .star-emo{font-size:76px}.star-q{font-family:'Fredoka One',cursive;font-size:32px}
+    .star-inp{width:100%;padding:14px;border:3px solid #E8E8E8;border-radius:16px;font-family:'Fredoka One',cursive;font-size:28px;text-align:center;letter-spacing:6px;outline:none;text-transform:lowercase;background:var(--cream);color:var(--text);transition:border-color .2s,background .2s}
+    .star-inp:focus{border-color:var(--teal);background:white}.star-inp.ok{border-color:var(--green);background:#DCFCE7}.star-inp.bad{border-color:var(--coral);background:#FFE5E5}
+    .star-res{font-family:'Fredoka One',cursive;font-size:22px;min-height:30px}
+    .star-res.ok{color:#16A34A}.star-res.bad{color:var(--coral)}
+    .gbtn{width:100%;padding:15px;border:none;border-radius:18px;font-family:'Fredoka One',cursive;font-size:21px;cursor:pointer;transition:transform .13s;color:white}
+    .gbtn:active{transform:scale(.95)}.gbtn.teal{background:linear-gradient(135deg,var(--teal),#2BB5AC)}.gbtn.purple{background:linear-gradient(135deg,var(--purple),#9333EA)}
   </style>
 </head>
 <body>
@@ -203,7 +250,8 @@
     <button class="hcard cb" id="btn-flash"><div class="hc-ico">🃏</div><div class="hc-lbl">플래시카드</div><div class="hc-sub">폴더 선택 후 연습</div></button>
     <button class="hcard cc" id="btn-spell"><div class="hc-ico">🖊️</div><div class="hc-lbl">철자 연습</div><div class="hc-sub">한 문제씩 연습</div></button>
     <button class="hcard ce" id="btn-exam"><div class="hc-ico">📝</div><div class="hc-lbl">시험 모드</div><div class="hc-sub">전체 한번에 채점</div></button>
-    <button class="hcard cd full" id="btn-daily"><div class="hc-ico">📅</div><div class="hc-lbl">오늘의 단어</div><div class="hc-sub">이번 주 단어 공유</div></button>
+    <button class="hcard cd" id="btn-daily"><div class="hc-ico">📅</div><div class="hc-lbl">오늘의 단어</div><div class="hc-sub">이번 주 단어 공유</div></button>
+    <button class="hcard" style="background:linear-gradient(135deg,#E0F7E9,#FFF9E0)" id="btn-game"><div class="hc-ico">🎮</div><div class="hc-lbl">게임</div><div class="hc-sub">4가지 단어 게임</div></button>
   </div>
 </div>
 
@@ -340,6 +388,113 @@
     </div>
     <div class="notif-note" id="notif-note">⚠️ 앱이 열려있을 때만 알림이 울려요.<br>💡 홈 화면에 추가하면 앱처럼 사용 가능!</div>
   </div>
+</div>
+
+<!-- GAME SELECT -->
+<div class="screen" id="s-game">
+  <div class="hdr"><button class="back" id="back-game">←</button><div class="hdr-t">🎮 단어 게임</div></div>
+  <div class="game-grid">
+    <button class="gcard" style="background:linear-gradient(135deg,#FEF9C3,#FFF0E0)" id="btn-g-quiz">
+      <div class="gc-ico">🔤</div><div class="gc-lbl">퀴즈</div><div class="gc-sub">4개 중 정답 고르기</div>
+    </button>
+    <button class="gcard" style="background:linear-gradient(135deg,#E0FDF4,#EFF6FF)" id="btn-g-match">
+      <div class="gc-ico">🧩</div><div class="gc-lbl">짝 맞추기</div><div class="gc-sub">영어-한국어 카드</div>
+    </button>
+    <button class="gcard" style="background:linear-gradient(135deg,#FFF0F0,#FFE5FB)" id="btn-g-catch">
+      <div class="gc-ico">🎯</div><div class="gc-lbl">단어 낚시</div><div class="gc-sub">떨어지는 단어 잡기</div>
+    </button>
+    <button class="gcard" style="background:linear-gradient(135deg,#EDE9FE,#FFF0F9)" id="btn-g-star">
+      <div class="gc-ico">⭐</div><div class="gc-lbl">별점 모으기</div><div class="gc-sub">맞추면 별 획득!</div>
+    </button>
+  </div>
+</div>
+
+<!-- QUIZ GAME -->
+<div class="screen" id="s-quiz">
+  <div class="hdr" style="width:100%;max-width:520px"><button class="back" id="back-quiz">←</button><div class="hdr-t">🔤 퀴즈</div></div>
+  <div class="quiz-score" id="quiz-score">0 / 0</div>
+  <div class="quiz-card" id="quiz-card">
+    <div class="quiz-emo" id="quiz-emo">🍎</div>
+    <div class="quiz-q" id="quiz-q">이 단어는?</div>
+    <div class="quiz-opts" id="quiz-opts"></div>
+    <div class="resmsg" id="quiz-res"></div>
+  </div>
+  <div id="quiz-done" style="display:none;flex-direction:column;align-items:center;gap:16px;text-align:center;padding-top:20px">
+    <div style="font-size:80px;animation:bob 1.2s infinite">🏆</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:32px" id="quiz-final"></div>
+    <button class="gbtn teal" id="quiz-retry" style="max-width:300px">🔄 다시 하기</button>
+    <button class="gbtn purple" id="quiz-home" style="max-width:300px">🏠 홈으로</button>
+  </div>
+</div>
+
+<!-- MATCH GAME -->
+<div class="screen" id="s-match">
+  <div class="hdr" style="width:100%;max-width:520px"><button class="back" id="back-match">←</button><div class="hdr-t">🧩 짝 맞추기</div></div>
+  <div class="match-info">
+    <div class="match-stat"><div class="match-stat-n" id="match-moves">0</div><div class="match-stat-l">시도 횟수</div></div>
+    <div class="match-stat"><div class="match-stat-n" id="match-pairs" style="color:var(--green)">0</div><div class="match-stat-l">맞춘 쌍</div></div>
+    <div class="match-stat"><div class="match-stat-n" id="match-left" style="color:var(--coral)">0</div><div class="match-stat-l">남은 쌍</div></div>
+  </div>
+  <div class="match-grid" id="match-grid"></div>
+</div>
+
+<!-- CATCH GAME -->
+<div class="screen" id="s-catch">
+  <div class="hdr" style="width:100%;max-width:520px"><button class="back" id="back-catch">←</button><div class="hdr-t">🎯 단어 낚시</div></div>
+  <div class="catch-hud">
+    <div class="catch-score-lbl">점수: <span id="catch-score">0</span></div>
+    <div class="catch-lives" id="catch-lives"></div>
+  </div>
+  <div class="catch-wrap" id="catch-wrap">
+    <div class="catch-ko" id="catch-ko">시작!</div>
+  </div>
+  <div id="catch-done" style="display:none;flex-direction:column;align-items:center;gap:16px;text-align:center;padding-top:20px">
+    <div style="font-size:80px">🎯</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:28px" id="catch-final"></div>
+    <button class="gbtn teal" id="catch-retry" style="max-width:300px">🔄 다시 하기</button>
+    <button class="gbtn purple" id="catch-home" style="max-width:300px">🏠 홈으로</button>
+  </div>
+</div>
+
+<!-- STAR GAME -->
+<div class="screen" id="s-star">
+  <div class="hdr" style="width:100%;max-width:520px"><button class="back" id="back-star">←</button><div class="hdr-t">⭐ 별점 모으기</div></div>
+  <div class="star-hud">
+    <div><div class="star-count">⭐ <span id="star-count">0</span></div><div style="font-size:12px;color:var(--muted);font-weight:700">모은 별</div></div>
+    <div style="text-align:right"><div class="star-lv" id="star-lv">1단계</div><div style="font-size:12px;color:var(--muted);font-weight:700">현재 단계</div></div>
+  </div>
+  <!-- 몬스터 표시 -->
+  <div id="star-monster" style="width:100%;max-width:520px;background:white;border-radius:24px;padding:18px 16px;box-shadow:var(--shadow);margin-bottom:12px;display:flex;align-items:center;gap:16px">
+    <div id="monster-svg" style="flex-shrink:0"></div>
+    <div style="flex:1">
+      <div id="monster-name" style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--text)"></div>
+      <div id="monster-desc" style="font-size:13px;color:var(--muted);font-weight:700;margin-top:4px"></div>
+      <div id="monster-next" style="font-size:12px;color:var(--purple);font-weight:700;margin-top:6px"></div>
+      <!-- progress to next level -->
+      <div style="background:#E8E8E8;border-radius:999px;height:8px;margin-top:8px;overflow:hidden">
+        <div id="star-prog" style="height:8px;border-radius:999px;background:linear-gradient(90deg,var(--yellow),var(--orange));transition:width .5s ease;width:0%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="star-card">
+    <div class="star-emo" id="star-emo">🍎</div>
+    <div class="star-q" id="star-q">사과</div>
+    <button class="sp-spk" id="star-spk-btn" style="margin-bottom:4px">🔊 발음 듣기</button>
+    <!-- 힌트 글자 칸 -->
+    <div id="star-hint" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:2px 0"></div>
+    <input class="star-inp" id="star-inp" placeholder="영어로 써보세요" autocomplete="off" autocorrect="off" spellcheck="false" autocapitalize="none">
+    <div class="star-res" id="star-res"></div>
+    <button class="gbtn teal" id="star-chk">확인 ✓</button>
+    <button class="gbtn purple" id="star-nxt" style="display:none">다음 ★</button>
+  </div>
+</div>
+
+<!-- 변신 오버레이 -->
+<div id="evolve-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:800;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center">
+  <div id="evolve-svg" style="animation:pulse 0.6s ease-in-out infinite"></div>
+  <div id="evolve-title" style="font-family:'Fredoka One',cursive;font-size:32px;color:white"></div>
+  <div id="evolve-sub" style="font-family:'Fredoka One',cursive;font-size:18px;color:#FFE66D"></div>
+  <button onclick="closeEvolve()" style="margin-top:8px;background:#FFE66D;border:none;border-radius:999px;padding:14px 36px;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;color:#2D2D2D">계속하기 →</button>
 </div>
 
 <script type="module">
@@ -536,8 +691,16 @@ function setNotif(){
 function fireNotif(){const lines=_daily.length?_daily.map(w=>`${w.en} — ${w.ko} ${w.em}`).join('\n'):'단어를 추가해주세요!';if(typeof Notification!=='undefined'&&Notification.permission==='granted')new Notification('📚 오늘의 영어 단어!',{body:lines});alert('📚 오늘의 영어 단어!\n\n'+lines+'\n\n✨ 화이팅!');}
 
 function setupEvents(){
-  $('btn-folders').onclick=()=>show('folders');$('btn-flash').onclick=()=>openPicker('flash');$('btn-spell').onclick=()=>openPicker('spell');$('btn-exam').onclick=()=>openPicker('exam');$('btn-daily').onclick=()=>show('daily');
-  $('back-folders').onclick=()=>show('home');$('back-detail').onclick=()=>show('folders');$('back-flash').onclick=()=>show('home');$('back-spell').onclick=()=>show('home');$('back-exam').onclick=()=>show('home');$('back-daily').onclick=()=>show('home');
+  $('btn-folders').onclick=()=>show('folders');$('btn-flash').onclick=()=>openPicker('flash');$('btn-spell').onclick=()=>openPicker('spell');$('btn-exam').onclick=()=>openPicker('exam');$('btn-daily').onclick=()=>show('daily');$('btn-game').onclick=()=>show('game');
+  $('back-folders').onclick=()=>show('home');$('back-detail').onclick=()=>show('folders');$('back-flash').onclick=()=>show('home');$('back-spell').onclick=()=>show('home');$('back-exam').onclick=()=>show('home');$('back-daily').onclick=()=>show('home');$('back-game').onclick=()=>show('home');
+  // 게임 선택
+  $('btn-g-quiz').onclick=startQuiz;$('btn-g-match').onclick=startMatch;$('btn-g-catch').onclick=startCatch;$('btn-g-star').onclick=startStar;
+  $('back-quiz').onclick=()=>show('game');$('back-match').onclick=()=>show('game');
+  $('back-catch').onclick=()=>{clearInterval(_catchTimer);show('game');};$('back-star').onclick=()=>show('game');
+  $('quiz-retry').onclick=startQuiz;$('quiz-home').onclick=()=>show('home');
+  $('catch-retry').onclick=startCatch;$('catch-home').onclick=()=>show('home');
+  $('star-chk').onclick=checkStar;$('star-nxt').onclick=nextStar;
+  $('star-spk-btn').onclick=()=>{if(_starWords.length&&_si2<_starWords.length)speak(_starWords[_si2].en);};
   $('add-folder-btn').onclick=()=>{const n=prompt('새 폴더 이름\n예) 3주차 / 동물 / 색깔');if(!n||!n.trim())return;D.folders.push({id:D.nfid++,name:n.trim(),ci:D.folders.length%COLORS.length,words:[]});save();renderFolders();};
   $('add-word-btn').onclick=addWord;
   const inpEn=$('inp-en'),inpKo=$('inp-ko');let _pt;
@@ -570,6 +733,487 @@ function setupEvents(){
   try{const sv=localStorage.getItem('ewrd_notif');if(sv){$('notif-time').value=sv;const[h,m]=sv.split(':').map(Number);(function sched(){const now=new Date(),next=new Date();next.setHours(h,m,0,0);if(next<=now)next.setDate(next.getDate()+1);clearTimeout(_ntTimer);_ntTimer=setTimeout(()=>{fireNotif();sched();},next-now);})();}}catch(e){}
   if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
+
+/* ══ QUIZ GAME ══ */
+let _qWords=[],_qi=0,_qOk=0,_qDone=false;
+function startQuiz(){
+  const all=D.folders.flatMap(f=>f.words);
+  if(all.length<4){toast('단어가 최소 4개 필요해요!');return;}
+  _qWords=[...all].sort(()=>Math.random()-.5);_qi=0;_qOk=0;_qDone=false;
+  $('quiz-card').style.display='';$('quiz-done').style.display='none';
+  show('quiz');renderQuiz();
+}
+function renderQuiz(){
+  if(_qi>=_qWords.length){showQuizDone();return;}
+  const w=_qWords[_qi],all=D.folders.flatMap(f=>f.words);
+  $('quiz-emo').textContent=w.em;$('quiz-q').textContent=w.ko;
+  $('quiz-res').textContent='';$('quiz-res').className='resmsg';
+  $('quiz-score').textContent=`${_qi} / ${_qWords.length}`;_qDone=false;
+  // 보기 4개 (정답 1 + 오답 3)
+  const wrong=[...all].filter(x=>x.id!==w.id).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[w,...wrong].sort(()=>Math.random()-.5);
+  $('quiz-opts').innerHTML=opts.map(o=>`<button class="qopt" data-en="${o.en}" data-correct="${o.id===w.id}">${o.en}</button>`).join('');
+  $('quiz-opts').querySelectorAll('.qopt').forEach(b=>b.addEventListener('click',()=>answerQuiz(b,w)));
+  speak(w.ko);
+}
+function answerQuiz(btn,w){
+  if(_qDone)return;_qDone=true;
+  const correct=btn.dataset.correct==='true';
+  if(correct){_qOk++;btn.classList.add('correct');$('quiz-res').textContent='🎉 정답!';$('quiz-res').className='resmsg ok';speak(w.en);spawnStars();}
+  else{btn.classList.add('wrong');$('quiz-res').textContent=`❌ 정답: ${w.en}`;$('quiz-res').className='resmsg bad';$('quiz-opts').querySelectorAll('.qopt').forEach(b=>{if(b.dataset.correct==='true')b.classList.add('correct');});}
+  setTimeout(()=>{_qi++;renderQuiz();},1200);
+}
+function showQuizDone(){
+  $('quiz-card').style.display='none';$('quiz-done').style.display='flex';
+  const pct=Math.round(_qOk/_qWords.length*100);
+  $('quiz-final').textContent=`${_qWords.length}문제 중 ${_qOk}개 정답!\n${pct}점 ${pct>=90?'🌟 완벽!':pct>=70?'👍 잘했어요!':pct>=50?'💪 조금만 더!':'🔄 다시!'}`;
+  spawnStars(pct>=70?20:8);
+}
+document.getElementById('quiz-card')||0; // ref
+
+/* ══ MATCH GAME ══ */
+let _matchCards=[],_matchFlipped=[],_matchMatched=0,_matchMoves=0,_matchLock=false;
+function startMatch(){
+  const all=D.folders.flatMap(f=>f.words);
+  if(!all.length){toast('단어를 먼저 추가해주세요!');return;}
+  const picks=[...all].sort(()=>Math.random()-.5).slice(0,Math.min(6,all.length));
+  // 영어 카드 + 한국어 카드 섞기
+  _matchCards=[...picks.map(w=>({id:w.id,type:'en',text:w.en,pair:w.id})),...picks.map(w=>({id:w.id+'-ko',type:'ko',text:w.ko,pair:w.id}))].sort(()=>Math.random()-.5);
+  _matchFlipped=[];_matchMatched=0;_matchMoves=0;_matchLock=false;
+  const cols=picks.length<=4?2:3;
+  $('match-grid').style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  $('match-moves').textContent=0;$('match-pairs').textContent=0;$('match-left').textContent=picks.length;
+  show('match');renderMatchGrid();
+}
+function renderMatchGrid(){
+  $('match-grid').innerHTML=_matchCards.map((c,i)=>`<button class="mcard" data-i="${i}">?</button>`).join('');
+  $('match-grid').querySelectorAll('.mcard').forEach(b=>b.addEventListener('click',()=>flipMatch(+b.dataset.i,b)));
+}
+function flipMatch(i,btn){
+  if(_matchLock||btn.classList.contains('matched')||btn.classList.contains('flipped'))return;
+  const c=_matchCards[i];
+  btn.textContent=c.text;btn.classList.add('flipped');
+  _matchFlipped.push({i,btn,c});
+  if(_matchFlipped.length===2){
+    _matchMoves++;$('match-moves').textContent=_matchMoves;
+    _matchLock=true;
+    const [a,b2]=_matchFlipped;
+    if(a.c.pair===b2.c.pair&&a.c.type!==b2.c.type){
+      // 정답
+      setTimeout(()=>{
+        a.btn.classList.remove('flipped');a.btn.classList.add('matched');
+        b2.btn.classList.remove('flipped');b2.btn.classList.add('matched');
+        _matchMatched++;$('match-pairs').textContent=_matchMatched;
+        $('match-left').textContent=(_matchCards.length/2)-_matchMatched;
+        _matchFlipped=[];_matchLock=false;
+        speak(a.c.type==='en'?a.c.text:b2.c.text);
+        spawnStars(4);
+        if(_matchMatched===_matchCards.length/2){setTimeout(()=>{toast('🎉 모두 맞췄어요!');spawnStars(20);},300);}
+      },400);
+    } else {
+      // 오답
+      setTimeout(()=>{
+        a.btn.classList.add('wrong-flash');b2.btn.classList.add('wrong-flash');
+        setTimeout(()=>{
+          a.btn.classList.remove('flipped','wrong-flash');a.btn.textContent='?';
+          b2.btn.classList.remove('flipped','wrong-flash');b2.btn.textContent='?';
+          _matchFlipped=[];_matchLock=false;
+        },500);
+      },400);
+    }
+  }
+}
+
+/* ══ CATCH GAME ══ */
+let _catchWords=[],_catchCur=null,_catchScore=0,_catchLives=3,_catchTimer=null,_catchFalling=[];
+const CATCH_COLORS=['#FF6B6B','#4ECDC4','#C084FC','#FB923C','#60A5FA','#4ADE80'];
+function startCatch(){
+  const all=D.folders.flatMap(f=>f.words);
+  if(all.length<3){toast('단어가 최소 3개 필요해요!');return;}
+  _catchWords=[...all];_catchScore=0;_catchLives=3;_catchFalling=[];
+  clearInterval(_catchTimer);
+  // wrap 안에 기존 단어 제거
+  const wrap=$('catch-wrap');
+  wrap.querySelectorAll('.catch-word').forEach(e=>e.remove());
+  $('catch-score').textContent=0;$('catch-done').style.display='none';
+  $('catch-wrap').style.display='block';
+  renderCatchLives();
+  show('catch');
+  // 새 단어 선택
+  nextCatchWord();
+  _catchTimer=setInterval(spawnCatchWord,2200);
+}
+function nextCatchWord(){
+  _catchCur=_catchWords[Math.floor(Math.random()*_catchWords.length)];
+  $('catch-ko').textContent=`👇 ${_catchCur.ko}`;
+  speak(_catchCur.ko);
+}
+function spawnCatchWord(){
+  if(!_catchCur)return;
+  const wrap=$('catch-wrap');
+  const all=D.folders.flatMap(f=>f.words);
+  // 가끔 틀린 단어도 섞기
+  const pool=Math.random()<0.5?[_catchCur,...all.filter(w=>w.id!==_catchCur.id).sort(()=>Math.random()-.5).slice(0,2)]:all.sort(()=>Math.random()-.5).slice(0,3);
+  pool.sort(()=>Math.random()-.5).slice(0,1).forEach(w=>{
+    const el=document.createElement('button');
+    el.className='catch-word';
+    el.textContent=w.en;
+    const ci=Math.floor(Math.random()*CATCH_COLORS.length);
+    el.style.cssText=`left:${10+Math.random()*60}%;top:-50px;color:${CATCH_COLORS[ci]};border-color:${CATCH_COLORS[ci]};background:${CATCH_COLORS[ci]}22`;
+    el.addEventListener('click',()=>tapCatchWord(el,w));
+    wrap.insertBefore(el,wrap.lastElementChild);
+    animateFall(el,w);
+  });
+}
+function animateFall(el,w){
+  let y=-50,speed=1.4+Math.random()*0.8;
+  const wrap=$('catch-wrap');
+  function frame(){
+    y+=speed;
+    el.style.top=y+'px';
+    if(y>wrap.offsetHeight){
+      el.remove();
+      if(w.id===_catchCur?.id){
+        _catchLives--;renderCatchLives();
+        if(_catchLives<=0){endCatch();return;}
+        nextCatchWord();
+      }
+    } else {
+      requestAnimationFrame(frame);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+function tapCatchWord(el,w){
+  if(w.id===_catchCur?.id){
+    _catchScore+=10;$('catch-score').textContent=_catchScore;
+    el.style.background='#DCFCE7';el.style.borderColor='var(--green)';el.style.color='#16A34A';
+    spawnStars(3);speak(w.en);
+    setTimeout(()=>{el.remove();nextCatchWord();},400);
+  } else {
+    el.style.background='#FFE5E5';el.style.borderColor='var(--coral)';el.style.color='var(--coral)';
+    setTimeout(()=>el.remove(),400);
+  }
+}
+function renderCatchLives(){
+  $('catch-lives').innerHTML='❤️'.repeat(_catchLives)+'🖤'.repeat(Math.max(0,3-_catchLives));
+}
+function endCatch(){
+  clearInterval(_catchTimer);
+  $('catch-wrap').style.display='none';
+  $('catch-done').style.display='flex';
+  $('catch-final').textContent=`최종 점수: ${_catchScore}점\n${_catchScore>=80?'🌟 대단해요!':_catchScore>=40?'👍 잘했어요!':'💪 다시 도전!'}`;
+}
+
+/* ══ STAR GAME + MONSTER EVOLUTION ══ */
+let _starWords=[],_si2=0,_starTotal=0,_starDone=false,_prevLv=-1;
+
+const MONSTERS=[
+  {min:0,  name:'뉴비 슬라임',    desc:'귀여운 초보 몬스터',       next:'별 30개 → 크리퍼블록으로 진화!',
+   svg:`<svg width="90" height="95" viewBox="0 0 80 90" style="animation:bob 2.5s ease-in-out infinite;overflow:visible">
+    <rect x="15" y="35" width="50" height="38" rx="4" fill="#5bc45e"/><rect x="11" y="45" width="58" height="28" rx="4" fill="#4db350"/>
+    <rect x="22" y="43" width="12" height="12" rx="2" fill="white"/><rect x="46" y="43" width="12" height="12" rx="2" fill="white"/>
+    <rect x="25" y="46" width="6" height="6" fill="#1a1a1a"/><rect x="49" y="46" width="6" height="6" fill="#1a1a1a"/>
+    <rect x="26" y="47" width="2" height="2" fill="white"/><rect x="50" y="47" width="2" height="2" fill="white"/>
+    <rect x="30" y="60" width="20" height="4" rx="2" fill="#2d7a30"/>
+    <rect x="18" y="72" width="14" height="10" rx="2" fill="#4db350"/><rect x="48" y="72" width="14" height="10" rx="2" fill="#4db350"/>
+   </svg>`},
+  {min:30, name:'크리퍼블록',     desc:'쉿... 폭발한다!',           next:'별 60개 → 좀비 전사로 진화!',
+   svg:`<svg width="90" height="105" viewBox="0 0 80 100" style="animation:bob 2.2s ease-in-out infinite;overflow:visible">
+    <rect x="14" y="6" width="52" height="48" rx="3" fill="#4a7c3f"/>
+    <rect x="20" y="16" width="14" height="14" rx="1" fill="#1a1a1a"/><rect x="46" y="16" width="14" height="14" rx="1" fill="#1a1a1a"/>
+    <rect x="30" y="32" width="20" height="8" rx="1" fill="#1a1a1a"/>
+    <rect x="26" y="36" width="8" height="14" rx="1" fill="#1a1a1a"/><rect x="46" y="36" width="8" height="14" rx="1" fill="#1a1a1a"/>
+    <rect x="20" y="54" width="40" height="30" rx="2" fill="#5a8f4e"/>
+    <rect x="18" y="82" width="16" height="16" rx="2" fill="#4a7c3f"/><rect x="46" y="82" width="16" height="16" rx="2" fill="#4a7c3f"/>
+   </svg>`},
+  {min:60, name:'좀비 전사',      desc:'으르렁! 뇌가 필요해',       next:'별 90개 → 스켈레톤 나이트로 진화!',
+   svg:`<svg width="90" height="108" viewBox="0 0 80 105" style="animation:shake 3s ease-in-out infinite;overflow:visible">
+    <rect x="16" y="4" width="48" height="46" rx="3" fill="#7fba6e"/>
+    <rect x="22" y="14" width="14" height="14" rx="1" fill="#ff4400"/><rect x="44" y="14" width="14" height="14" rx="1" fill="#ff4400"/>
+    <rect x="25" y="17" width="8" height="8" fill="#ff8844"/><rect x="47" y="17" width="8" height="8" fill="#ff8844"/>
+    <rect x="22" y="34" width="36" height="6" rx="1" fill="#1a1a1a"/>
+    <rect x="26" y="32" width="4" height="10" rx="1" fill="#1a1a1a"/><rect x="34" y="32" width="4" height="10" rx="1" fill="#1a1a1a"/>
+    <rect x="42" y="32" width="4" height="10" rx="1" fill="#1a1a1a"/><rect x="50" y="32" width="4" height="10" rx="1" fill="#1a1a1a"/>
+    <rect x="18" y="50" width="44" height="34" rx="2" fill="#6aad58"/><rect x="18" y="50" width="44" height="10" rx="2" fill="#8B6914"/>
+    <rect x="2" y="50" width="16" height="10" rx="2" fill="#7fba6e"/>
+    <rect x="18" y="82" width="18" height="20" rx="2" fill="#6aad58"/><rect x="44" y="82" width="18" height="20" rx="2" fill="#6aad58"/>
+   </svg>`},
+  {min:90, name:'스켈레톤 나이트', desc:'영원한 어둠의 기사',        next:'별 120개 → 마그마 골렘으로 진화!',
+   svg:`<svg width="90" height="115" viewBox="0 0 85 112" style="animation:bob 1.8s ease-in-out infinite;overflow:visible">
+    <rect x="14" y="2" width="52" height="12" rx="3" fill="#999"/><rect x="16" y="8" width="48" height="44" rx="4" fill="#f0ece0"/>
+    <rect x="21" y="16" width="16" height="16" rx="2" fill="#1a1a1a"/><rect x="47" y="16" width="16" height="16" rx="2" fill="#1a1a1a"/>
+    <rect x="24" y="19" width="10" height="10" rx="1" fill="#2244cc"/><rect x="50" y="19" width="10" height="10" rx="1" fill="#2244cc"/>
+    <rect x="22" y="42" width="36" height="6" rx="1" fill="#1a1a1a"/>
+    <rect x="24" y="41" width="6" height="9" rx="1" fill="#f0ece0"/><rect x="32" y="41" width="6" height="9" rx="1" fill="#f0ece0"/>
+    <rect x="42" y="41" width="6" height="9" rx="1" fill="#f0ece0"/><rect x="52" y="41" width="6" height="9" rx="1" fill="#f0ece0"/>
+    <rect x="16" y="52" width="50" height="36" rx="3" fill="#888"/><rect x="20" y="55" width="42" height="30" rx="2" fill="#aaa"/>
+    <rect x="36" y="55" width="12" height="30" fill="#888"/><rect x="20" y="66" width="42" height="6" fill="#888"/>
+    <rect x="18" y="86" width="18" height="24" rx="2" fill="#999"/><rect x="46" y="86" width="18" height="24" rx="2" fill="#999"/>
+    <rect x="68" y="18" width="6" height="46" rx="2" fill="#ccc"/><rect x="62" y="38" width="18" height="6" rx="1" fill="#888"/>
+    <rect x="69" y="12" width="4" height="10" rx="1" fill="#f59e0b"/>
+   </svg>`},
+  {min:120,name:'마그마 골렘',    desc:'용암으로 만든 거인',         next:'별 150개 → 엔더 워커로 진화!',
+   svg:`<svg width="90" height="118" viewBox="0 0 90 115" style="animation:pulse 1.6s ease-in-out infinite;overflow:visible">
+    <rect x="14" y="46" width="62" height="54" rx="4" fill="#7c2d12"/>
+    <rect x="34" y="52" width="22" height="42" rx="2" fill="#ea580c" opacity=".6"/>
+    <rect x="38" y="48" width="14" height="50" rx="2" fill="#f97316" opacity=".5"/>
+    <rect x="18" y="60" width="14" height="4" rx="1" fill="#f97316"/><rect x="58" y="60" width="14" height="4" rx="1" fill="#f97316"/>
+    <rect x="18" y="72" width="10" height="4" rx="1" fill="#fb923c"/><rect x="62" y="74" width="10" height="4" rx="1" fill="#fb923c"/>
+    <rect x="18" y="8" width="54" height="44" rx="4" fill="#92400e"/>
+    <rect x="24" y="18" width="18" height="14" rx="2" fill="#1a1a1a"/><rect x="48" y="18" width="18" height="14" rx="2" fill="#1a1a1a"/>
+    <rect x="26" y="20" width="14" height="10" rx="1" fill="#f97316"/><rect x="50" y="20" width="14" height="10" rx="1" fill="#f97316"/>
+    <rect x="28" y="22" width="10" height="6" fill="#fbbf24"/><rect x="52" y="22" width="10" height="6" fill="#fbbf24"/>
+    <rect x="24" y="38" width="42" height="10" rx="2" fill="#1a1a1a"/>
+    <rect x="26" y="40" width="6" height="8" rx="1" fill="#f97316"/><rect x="36" y="40" width="6" height="8" rx="1" fill="#f97316"/>
+    <rect x="46" y="40" width="6" height="8" rx="1" fill="#f97316"/><rect x="56" y="40" width="6" height="8" rx="1" fill="#f97316"/>
+    <rect x="0" y="50" width="14" height="40" rx="3" fill="#92400e"/><rect x="76" y="50" width="14" height="40" rx="3" fill="#92400e"/>
+    <rect x="0" y="86" width="18" height="16" rx="3" fill="#7c2d12"/><rect x="72" y="86" width="18" height="16" rx="3" fill="#7c2d12"/>
+    <rect x="16" y="98" width="22" height="16" rx="3" fill="#7c2d12"/><rect x="52" y="98" width="22" height="16" rx="3" fill="#7c2d12"/>
+   </svg>`},
+  {min:150,name:'엔더 워커',      desc:'차원을 넘나드는 자',         next:'별 180개 → 위더 킹으로 진화!',
+   svg:`<svg width="90" height="125" viewBox="0 0 80 120" style="animation:glw 1.5s ease-in-out infinite;overflow:visible">
+    <style>@keyframes glw{0%,100%{opacity:1}50%{opacity:.55}}</style>
+    <rect x="24" y="34" width="32" height="58" rx="3" fill="#1a0a2e"/>
+    <rect x="12" y="4" width="56" height="50" rx="3" fill="#0d0020"/>
+    <rect x="16" y="16" width="20" height="12" rx="2" fill="#9333ea"/><rect x="44" y="16" width="20" height="12" rx="2" fill="#9333ea"/>
+    <rect x="18" y="18" width="16" height="8" rx="1" fill="#c084fc"/><rect x="46" y="18" width="16" height="8" rx="1" fill="#c084fc"/>
+    <rect x="20" y="20" width="12" height="4" fill="white" opacity=".7"/><rect x="48" y="20" width="12" height="4" fill="white" opacity=".7"/>
+    <rect x="20" y="36" width="40" height="14" rx="2" fill="#6b21a8"/><rect x="22" y="38" width="36" height="10" rx="1" fill="#0d0020"/>
+    <rect x="6" y="14" width="5" height="5" rx="1" fill="#9333ea" opacity=".8"/>
+    <rect x="70" y="22" width="4" height="4" rx="1" fill="#c084fc" opacity=".6"/>
+    <rect x="2" y="54" width="22" height="8" rx="2" fill="#1a0a2e"/><rect x="56" y="54" width="22" height="8" rx="2" fill="#1a0a2e"/>
+    <rect x="0" y="60" width="10" height="28" rx="2" fill="#0d0020"/><rect x="70" y="60" width="10" height="28" rx="2" fill="#0d0020"/>
+    <rect x="24" y="90" width="14" height="30" rx="2" fill="#0d0020"/><rect x="42" y="90" width="14" height="30" rx="2" fill="#0d0020"/>
+    <rect x="10" y="2" width="60" height="54" rx="6" fill="none" stroke="#9333ea" stroke-width="2" opacity=".4"/>
+   </svg>`},
+  {min:180,name:'위더 킹',        desc:'세 머리의 어둠의 왕',        next:'별 220개 → 아이언 타이탄으로 진화!',
+   svg:`<svg width="100" height="125" viewBox="0 0 100 120" style="animation:shake 2s ease-in-out infinite;overflow:visible">
+    <rect x="2" y="10" width="28" height="24" rx="3" fill="#2d2d3d"/>
+    <rect x="6" y="15" width="8" height="8" rx="1" fill="#60a5fa"/><rect x="18" y="15" width="8" height="8" rx="1" fill="#60a5fa"/>
+    <rect x="7" y="17" width="6" height="4" fill="#93c5fd"/><rect x="19" y="17" width="6" height="4" fill="#93c5fd"/>
+    <rect x="6" y="26" width="20" height="5" rx="1" fill="#1a1a2e"/>
+    <rect x="34" y="2" width="32" height="28" rx="3" fill="#1a1a2e"/>
+    <rect x="38" y="9" width="10" height="10" rx="1" fill="#818cf8"/><rect x="52" y="9" width="10" height="10" rx="1" fill="#818cf8"/>
+    <rect x="39" y="11" width="8" height="6" fill="#c7d2fe"/><rect x="53" y="11" width="8" height="6" fill="#c7d2fe"/>
+    <rect x="38" y="22" width="24" height="5" rx="1" fill="#0f0f1a"/>
+    <rect x="40" y="21" width="4" height="8" rx="1" fill="#e2e8f0"/><rect x="46" y="21" width="4" height="8" rx="1" fill="#e2e8f0"/>
+    <rect x="52" y="21" width="4" height="8" rx="1" fill="#e2e8f0"/>
+    <rect x="70" y="10" width="28" height="24" rx="3" fill="#2d2d3d"/>
+    <rect x="74" y="15" width="8" height="8" rx="1" fill="#60a5fa"/><rect x="86" y="15" width="8" height="8" rx="1" fill="#60a5fa"/>
+    <rect x="75" y="17" width="6" height="4" fill="#93c5fd"/><rect x="87" y="17" width="6" height="4" fill="#93c5fd"/>
+    <rect x="74" y="26" width="20" height="5" rx="1" fill="#1a1a2e"/>
+    <rect x="28" y="30" width="44" height="52" rx="4" fill="#1a1a2e"/>
+    <rect x="32" y="38" width="36" height="4" rx="1" fill="#2d2d3d"/><rect x="32" y="46" width="36" height="4" rx="1" fill="#2d2d3d"/>
+    <rect x="32" y="54" width="36" height="4" rx="1" fill="#2d2d3d"/><rect x="32" y="62" width="36" height="4" rx="1" fill="#2d2d3d"/>
+    <rect x="46" y="30" width="8" height="52" rx="2" fill="#4f46e5" opacity=".4"/>
+    <rect x="8" y="34" width="20" height="8" rx="2" fill="#2d2d3d"/><rect x="72" y="34" width="20" height="8" rx="2" fill="#2d2d3d"/>
+    <rect x="4" y="40" width="8" height="30" rx="2" fill="#1a1a2e"/><rect x="88" y="40" width="8" height="30" rx="2" fill="#1a1a2e"/>
+    <rect x="30" y="80" width="16" height="34" rx="2" fill="#2d2d3d"/><rect x="54" y="80" width="16" height="34" rx="2" fill="#2d2d3d"/>
+    <rect x="26" y="28" width="48" height="56" rx="6" fill="none" stroke="#818cf8" stroke-width="2" opacity=".4"/>
+   </svg>`},
+  {min:220,name:'아이언 타이탄',   desc:'강철 거인 전사',             next:'별 270개 → 네더 피글린으로 진화!',
+   svg:`<svg width="95" height="122" viewBox="0 0 95 120" style="animation:pulse 2s ease-in-out infinite;overflow:visible">
+    <rect x="18" y="42" width="59" height="60" rx="5" fill="#374151"/><rect x="22" y="46" width="51" height="52" rx="4" fill="#4b5563"/>
+    <rect x="30" y="50" width="35" height="44" rx="3" fill="#6b7280"/>
+    <rect x="22" y="50" width="6" height="6" rx="3" fill="#9ca3af"/><rect x="67" y="50" width="6" height="6" rx="3" fill="#9ca3af"/>
+    <rect x="22" y="90" width="6" height="6" rx="3" fill="#9ca3af"/><rect x="67" y="90" width="6" height="6" rx="3" fill="#9ca3af"/>
+    <rect x="36" y="56" width="23" height="16" rx="8" fill="#22d3ee" opacity=".8"/>
+    <rect x="40" y="60" width="15" height="8" rx="4" fill="white" opacity=".9"/>
+    <rect x="32" y="76" width="6" height="12" rx="2" fill="#374151"/><rect x="40" y="76" width="6" height="12" rx="2" fill="#374151"/>
+    <rect x="48" y="76" width="6" height="12" rx="2" fill="#374151"/><rect x="56" y="76" width="6" height="12" rx="2" fill="#374151"/>
+    <rect x="16" y="6" width="63" height="42" rx="5" fill="#374151"/><rect x="20" y="10" width="55" height="34" rx="4" fill="#4b5563"/>
+    <rect x="22" y="16" width="51" height="16" rx="4" fill="#1a1a1a"/>
+    <rect x="24" y="18" width="47" height="12" rx="3" fill="#22d3ee" opacity=".7"/>
+    <rect x="26" y="20" width="43" height="8" rx="2" fill="white" opacity=".5"/>
+    <rect x="24" y="36" width="8" height="8" rx="1" fill="#374151"/><rect x="34" y="36" width="8" height="8" rx="1" fill="#374151"/>
+    <rect x="44" y="36" width="8" height="8" rx="1" fill="#374151"/><rect x="54" y="36" width="8" height="8" rx="1" fill="#374151"/>
+    <rect x="64" y="36" width="8" height="8" rx="1" fill="#374151"/>
+    <rect x="0" y="46" width="18" height="46" rx="4" fill="#4b5563"/><rect x="77" y="46" width="18" height="46" rx="4" fill="#4b5563"/>
+    <rect x="0" y="88" width="22" height="18" rx="4" fill="#374151"/><rect x="73" y="88" width="22" height="18" rx="4" fill="#374151"/>
+    <rect x="20" y="100" width="22" height="18" rx="3" fill="#374151"/><rect x="53" y="100" width="22" height="18" rx="3" fill="#374151"/>
+   </svg>`},
+  {min:270,name:'네더 피글린',     desc:'황금 갑옷의 돼지 전사',      next:'별 330개 → 엔더 드래곤으로 진화!',
+   svg:`<svg width="90" height="120" viewBox="0 0 90 118" style="animation:bob 1.6s ease-in-out infinite;overflow:visible">
+    <rect x="18" y="2" width="54" height="12" rx="2" fill="#f59e0b"/>
+    <rect x="22" y="0" width="8" height="10" rx="1" fill="#fbbf24"/><rect x="36" y="0" width="8" height="12" rx="1" fill="#fcd34d"/>
+    <rect x="50" y="0" width="8" height="12" rx="1" fill="#fbbf24"/><rect x="64" y="0" width="6" height="10" rx="1" fill="#fbbf24"/>
+    <rect x="16" y="10" width="58" height="50" rx="4" fill="#f9a8d4"/>
+    <rect x="26" y="42" width="38" height="14" rx="6" fill="#fbb6ce"/>
+    <rect x="32" y="46" width="8" height="6" rx="3" fill="#be185d"/><rect x="50" y="46" width="8" height="6" rx="3" fill="#be185d"/>
+    <rect x="22" y="18" width="18" height="18" rx="2" fill="#1a1a1a"/><rect x="50" y="18" width="18" height="18" rx="2" fill="#1a1a1a"/>
+    <rect x="24" y="20" width="14" height="14" rx="1" fill="#dc2626"/><rect x="52" y="20" width="14" height="14" rx="1" fill="#dc2626"/>
+    <rect x="26" y="22" width="8" height="8" fill="#ef4444"/><rect x="54" y="22" width="8" height="8" fill="#ef4444"/>
+    <rect x="26" y="22" width="4" height="4" fill="white" opacity=".6"/><rect x="54" y="22" width="4" height="4" fill="white" opacity=".6"/>
+    <rect x="18" y="60" width="54" height="38" rx="3" fill="#d97706"/><rect x="22" y="64" width="46" height="30" rx="2" fill="#f59e0b"/>
+    <rect x="36" y="64" width="18" height="30" fill="#d97706"/><rect x="22" y="76" width="46" height="6" fill="#d97706"/>
+    <rect x="70" y="30" width="6" height="42" rx="2" fill="#fcd34d"/>
+    <rect x="64" y="50" width="18" height="6" rx="1" fill="#d97706"/><rect x="71" y="24" width="4" height="10" rx="1" fill="#f59e0b"/>
+    <rect x="20" y="96" width="20" height="20" rx="3" fill="#b45309"/><rect x="50" y="96" width="20" height="20" rx="3" fill="#b45309"/>
+    <rect x="18" y="108" width="24" height="10" rx="2" fill="#d97706"/><rect x="48" y="108" width="24" height="10" rx="2" fill="#d97706"/>
+   </svg>`},
+  {min:330,name:'엔더 드래곤',     desc:'전설의 최강 보스!',          next:'최고 단계 달성! 👑 전설의 몬스터!',
+   svg:`<svg width="110" height="125" viewBox="0 0 100 122" style="animation:pulse 1.2s ease-in-out infinite;overflow:visible">
+    <polygon points="2,38 28,58 18,88 0,93" fill="#1a0a2e"/>
+    <polygon points="98,38 72,58 82,88 100,93" fill="#1a0a2e"/>
+    <line x1="2" y1="38" x2="18" y2="88" stroke="#9333ea" stroke-width="1" opacity=".5"/>
+    <line x1="98" y1="38" x2="82" y2="88" stroke="#9333ea" stroke-width="1" opacity=".5"/>
+    <rect x="36" y="26" width="28" height="20" rx="4" fill="#0d0020"/>
+    <rect x="20" y="44" width="60" height="54" rx="6" fill="#0d0020"/>
+    <rect x="26" y="50" width="10" height="8" rx="2" fill="#1a0a2e"/><rect x="40" y="50" width="10" height="8" rx="2" fill="#1a0a2e"/>
+    <rect x="54" y="50" width="10" height="8" rx="2" fill="#1a0a2e"/><rect x="68" y="50" width="8" height="8" rx="2" fill="#1a0a2e"/>
+    <rect x="32" y="62" width="10" height="8" rx="2" fill="#1a0a2e"/><rect x="46" y="62" width="10" height="8" rx="2" fill="#1a0a2e"/>
+    <rect x="60" y="62" width="10" height="8" rx="2" fill="#1a0a2e"/>
+    <rect x="22" y="2" width="56" height="48" rx="5" fill="#0d0020"/>
+    <polygon points="28,2 34,2 31,12" fill="#9333ea"/><polygon points="40,2 48,2 44,14" fill="#7c3aed"/>
+    <polygon points="58,2 66,2 62,14" fill="#7c3aed"/><polygon points="72,2 78,2 75,12" fill="#9333ea"/>
+    <rect x="26" y="14" width="18" height="14" rx="2" fill="#9333ea"/><rect x="62" y="14" width="18" height="14" rx="2" fill="#9333ea"/>
+    <rect x="28" y="16" width="14" height="10" rx="1" fill="#c084fc"/><rect x="64" y="16" width="14" height="10" rx="1" fill="#c084fc"/>
+    <rect x="30" y="18" width="10" height="6" fill="white" opacity=".9"/><rect x="66" y="18" width="10" height="6" fill="white" opacity=".9"/>
+    <rect x="36" y="32" width="8" height="6" rx="2" fill="#6b21a8"/><rect x="60" y="32" width="8" height="6" rx="2" fill="#6b21a8"/>
+    <rect x="26" y="42" width="52" height="6" rx="1" fill="#6b21a8"/>
+    <rect x="28" y="40" width="6" height="10" rx="1" fill="white"/><rect x="38" y="40" width="6" height="10" rx="1" fill="white"/>
+    <rect x="56" y="40" width="6" height="10" rx="1" fill="white"/><rect x="66" y="40" width="6" height="10" rx="1" fill="white"/>
+    <rect x="24" y="96" width="20" height="20" rx="3" fill="#1a0a2e"/><rect x="60" y="96" width="20" height="20" rx="3" fill="#1a0a2e"/>
+    <polygon points="24,114 28,122 32,114" fill="#7c3aed"/><polygon points="32,114 36,122 40,114" fill="#7c3aed"/>
+    <polygon points="60,114 64,122 68,114" fill="#7c3aed"/><polygon points="68,114 72,122 76,114" fill="#7c3aed"/>
+    <rect x="18" y="0" width="64" height="52" rx="8" fill="none" stroke="#9333ea" stroke-width="2.5" opacity=".5"/>
+   </svg>`},
+];
+
+function getCurMonster(n){
+  let m=MONSTERS[0];
+  for(const s of MONSTERS){if(n>=s.min)m=s;}
+  return m;
+}
+function getCurMonsterIdx(n){
+  let idx=0;
+  for(let i=0;i<MONSTERS.length;i++){if(n>=MONSTERS[i].min)idx=i;}
+  return idx;
+}
+function updStarHud(){
+  $('star-count').textContent=_starTotal;
+  const idx=getCurMonsterIdx(_starTotal);
+  const m=MONSTERS[idx];
+  $('star-lv').textContent=`${idx+1}단계 ${m.name}`;
+  $('monster-svg').innerHTML=m.svg;
+  $('monster-name').textContent=m.name;
+  $('monster-desc').textContent=m.desc;
+  // progress bar to next level
+  const next=MONSTERS[idx+1];
+  if(next){
+    const pct=Math.round((_starTotal-m.min)/(next.min-m.min)*100);
+    $('star-prog').style.width=pct+'%';
+    $('monster-next').textContent=`다음: ${m.min}~${next.min-1}개 (${pct}%) → ${next.name}`;
+  } else {
+    $('star-prog').style.width='100%';
+    $('monster-next').textContent='🏆 최고 단계 달성! 전설의 몬스터!';
+  }
+}
+function showEvolve(m){
+  $('evolve-svg').innerHTML=m.svg;
+  $('evolve-title').textContent=`✨ ${m.name} 으로 진화! ✨`;
+  $('evolve-sub').textContent=m.desc;
+  $('evolve-overlay').style.display='flex';
+  spawnStars(30);
+}
+function closeEvolve(){
+  $('evolve-overlay').style.display='none';
+}
+function startStar(){
+  const all=D.folders.flatMap(f=>f.words);
+  if(!all.length){toast('단어를 먼저 추가해주세요!');return;}
+  _starWords=[...all].sort(()=>Math.random()-.5);_si2=0;_starDone=false;
+  try{_starTotal=+localStorage.getItem('star_total')||0;}catch(e){_starTotal=0;}
+  _prevLv=getCurMonsterIdx(_starTotal);
+  updStarHud();show('star');renderStar();
+}
+let _starHintShown=new Set();
+let _starBlankPositions=[];
+
+function makeHint(word){
+  const len=word.length;
+  const pool=[...Array(len).keys()];
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  const showCount=Math.min(2,Math.max(0,len-1));
+  _starHintShown=new Set(pool.slice(0,showCount));
+  _starBlankPositions=pool.slice(showCount).sort((a,b)=>a-b);
+  if(!_starBlankPositions.length) _starBlankPositions=[...pool];
+}
+function renderHintBoxes(word,typed){
+  const t=(typed||'').toLowerCase();
+  $('star-hint').innerHTML=word.split('').map((ch,i)=>{
+    const shown=_starHintShown.has(i);
+    const bi=_starBlankPositions.indexOf(i);
+    const filled=!shown&&bi>=0&&bi<t.length?t[bi]:null;
+    const bg=shown?'#E0FDF4':filled?'#EDE9FE':'var(--cream)';
+    const border=shown?'var(--teal)':filled?'var(--purple)':'#E8E8E8';
+    const color=shown?'#0f766e':filled?'#7c3aed':'var(--muted)';
+    const txt=shown?ch:filled||'&nbsp;';
+    return `<div style="width:38px;height:46px;border-radius:10px;border:2.5px solid ${border};background:${bg};display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:22px;color:${color}">${txt}</div>`;
+  }).join('');
+}
+function reconstructWord(word,typed){
+  const t=(typed||'').toLowerCase();
+  let ti=0;
+  return word.split('').map((ch,i)=>_starHintShown.has(i)?ch:(t[ti++]||'')).join('');
+}
+function renderStar(){
+  if(_si2>=_starWords.length){_si2=0;_starWords.sort(()=>Math.random()-.5);}
+  const w=_starWords[_si2];
+  $('star-emo').textContent=w.em;
+  $('star-q').textContent=w.ko;
+  makeHint(w.en);
+  renderHintBoxes(w.en,'');
+  const blankCount=_starBlankPositions.length;
+  const inp=$('star-inp');
+  inp.value='';
+  inp.className='star-inp';
+  inp.disabled=false;
+  inp.removeAttribute('maxlength');
+  inp.maxLength=blankCount>0?blankCount:20;
+  inp.placeholder='빈칸 '+blankCount+'글자 입력';
+  inp.style.letterSpacing=blankCount<=3?'12px':'7px';
+  $('star-res').textContent='';
+  $('star-res').className='star-res';
+  $('star-chk').style.display='';
+  $('star-nxt').style.display='none';
+  _starDone=false;
+  inp.oninput=()=>renderHintBoxes(w.en,inp.value);
+  inp.onkeydown=e=>{if(e.key==='Enter')_starDone?nextStar():checkStar();};
+  setTimeout(()=>inp.focus(),200);
+}
+function checkStar(){
+  if(_starDone)return;
+  const w=_starWords[_si2];
+  const typed=$('star-inp').value.toLowerCase();
+  const reconstructed=reconstructWord(w.en,typed);
+  _starDone=true;
+  $('star-inp').disabled=true;
+  if(reconstructed===w.en){
+    _starTotal++;
+    try{localStorage.setItem('star_total',_starTotal);}catch(e){}
+    $('star-inp').className='star-inp ok';
+    $('star-res').textContent='🌟 +1별! 정답: '+w.en;
+    $('star-res').className='star-res ok';
+    speak(w.en);spawnStars(6);
+    $('star-hint').innerHTML=w.en.split('').map(ch=>`<div style="width:38px;height:46px;border-radius:10px;border:2.5px solid var(--green);background:#DCFCE7;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:22px;color:#16A34A">${ch}</div>`).join('');
+    const newLv=getCurMonsterIdx(_starTotal);
+    if(newLv>_prevLv){_prevLv=newLv;setTimeout(()=>showEvolve(MONSTERS[newLv]),600);}
+    updStarHud();
+  } else {
+    $('star-inp').className='star-inp bad';
+    $('star-res').textContent='❌ 정답: '+w.en;
+    $('star-res').className='star-res bad';
+    $('star-hint').innerHTML=w.en.split('').map((ch,i)=>{
+      const shown=_starHintShown.has(i);
+      return `<div style="width:38px;height:46px;border-radius:10px;border:2.5px solid ${shown?'var(--teal)':'var(--coral)'};background:${shown?'#E0FDF4':'#FFE5E5'};display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:22px;color:${shown?'#0f766e':'var(--coral)'}">${ch}</div>`;
+    }).join('');
+  }
+  $('star-chk').style.display='none';
+  $('star-nxt').style.display='';
+}
+function nextStar(){_si2++;renderStar();}
 
 init();
 </script>
