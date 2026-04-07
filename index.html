@@ -1134,8 +1134,10 @@ function closeEvolve(){
   $('evolve-overlay').style.display='none';
 }
 function startStar(){
-  const all=D.folders.flatMap(f=>f.words);
-  if(!all.length){toast('단어를 먼저 추가해주세요!');return;}
+  const lf=latestFolder();
+  if(!lf||!lf.words.length){toast('단어를 먼저 추가해주세요!');return;}
+  const all=lf.words;
+  $('back-star').parentElement.querySelector('.hdr-t').textContent='⭐ '+lf.name;
   _starWords=[...all].sort(()=>Math.random()-.5);_si2=0;_starDone=false;
   try{_starTotal=+localStorage.getItem('star_total')||0;}catch(e){_starTotal=0;}
   _prevLv=getCurMonsterIdx(_starTotal);
