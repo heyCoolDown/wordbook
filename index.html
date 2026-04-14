@@ -210,6 +210,14 @@
     .star-res.ok{color:#16A34A}.star-res.bad{color:var(--coral)}
     .gbtn{width:100%;padding:15px;border:none;border-radius:18px;font-family:'Fredoka One',cursive;font-size:21px;cursor:pointer;transition:transform .13s;color:white}
     .gbtn:active{transform:scale(.95)}.gbtn.teal{background:linear-gradient(135deg,var(--teal),#2BB5AC)}.gbtn.purple{background:linear-gradient(135deg,var(--purple),#9333EA)}
+
+    @keyframes poke-attack{0%{transform:translateX(0) scale(1);filter:brightness(1)}25%{transform:translateX(36px) scale(1.35);filter:brightness(2.8) drop-shadow(0 0 12px gold)}55%{transform:translateX(-8px) scale(.88);filter:brightness(1)}80%{transform:translateX(4px) scale(1.05)}100%{transform:translateX(0) scale(1);filter:brightness(1)}}
+    @keyframes effect-pop{0%{opacity:1;transform:translate(-50%,-50%) scale(.4) rotate(-10deg)}35%{opacity:1;transform:translate(-50%,-90%) scale(1.4) rotate(8deg)}100%{opacity:0;transform:translate(-50%,-180%) scale(.7) rotate(-5deg)}}
+    @keyframes screen-flash{0%,100%{background:transparent}50%{background:rgba(255,255,255,.18)}}
+    .poke-atk{animation:poke-attack .55s cubic-bezier(.4,0,.2,1) !important}
+    .poke-effect{position:absolute;font-size:44px;pointer-events:none;animation:effect-pop .85s ease-out forwards;z-index:20;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+    #star-monster{transition:box-shadow .15s;cursor:pointer}
+    #star-monster:active{box-shadow:0 0 0 3px var(--yellow),var(--shadow)}
   </style>
 </head>
 <body>
@@ -1260,6 +1268,40 @@ function checkStar(){
   $('star-nxt').style.display='';
 }
 function nextStar(){_si2++;renderStar();}
+
+/* ══ POKEMON CLICK ATTACK ══ */
+const TYPE_FX={fire:'🔥',water:'💧',electric:'⚡',psychic:'🔮',grass:'🌿',ice:'❄️',
+  dragon:'🐲',dark:'🌑',steel:'⚙️',fairy:'✨',fighting:'👊',ghost:'👻',
+  rock:'🪨',ground:'💨',flying:'🌪️',poison:'☠️',bug:'🐛',normal:'💫'};
+
+document.getElementById('star-monster').addEventListener('click',()=>{
+  const img=document.getElementById('monster-svg').querySelector('img');
+  if(!img||img.classList.contains('poke-atk'))return;
+  img.classList.add('poke-atk');
+  const idx=getCurMonsterIdx(_starTotal);
+  const m=MONSTERS[idx];
+  const typeStr=m.desc.split('·')[1]?.trim().split('/')[0]?.trim().toLowerCase()||'normal';
+  const fx=TYPE_FX[typeStr]||'💥';
+  const wrap=document.getElementById('star-monster');
+  // 이펙트 이모지 생성
+  for(let k=0;k<2;k++){
+    const el=document.createElement('div');
+    el.className='poke-effect';
+    el.textContent=k===0?fx:'✨';
+    el.style.left=(20+Math.random()*55)+'%';
+    el.style.top=(20+Math.random()*30)+'%';
+    el.style.animationDelay=(k*0.15)+'s';
+    wrap.appendChild(el);
+    setTimeout(()=>el.remove(),1000);
+  }
+  // 화면 플래시
+  const flash=document.createElement('div');
+  flash.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:799;animation:screen-flash .3s ease';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),350);
+  spawnStars(4);
+  setTimeout(()=>img.classList.remove('poke-atk'),600);
+});
 
 init();
 </script>
