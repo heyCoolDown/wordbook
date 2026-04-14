@@ -465,7 +465,7 @@
   </div>
   <!-- 몬스터 표시 -->
   <div id="star-monster" style="width:100%;max-width:520px;background:white;border-radius:24px;padding:18px 16px;box-shadow:var(--shadow);margin-bottom:12px;display:flex;align-items:center;gap:16px">
-    <div id="monster-svg" style="flex-shrink:0"></div>
+    <div id="monster-svg" style="flex-shrink:0;width:96px;height:96px;display:flex;align-items:center;justify-content:center"></div>
     <div style="flex:1">
       <div id="monster-name" style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--text)"></div>
       <div id="monster-desc" style="font-size:13px;color:var(--muted);font-weight:700;margin-top:4px"></div>
@@ -491,7 +491,7 @@
 
 <!-- 변신 오버레이 -->
 <div id="evolve-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:800;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center">
-  <div id="evolve-svg" style="animation:pulse 0.6s ease-in-out infinite"></div>
+  <div id="evolve-svg" style="animation:pulse 0.6s ease-in-out infinite;width:160px;height:160px;display:flex;align-items:center;justify-content:center"></div>
   <div id="evolve-title" style="font-family:'Fredoka One',cursive;font-size:32px;color:white"></div>
   <div id="evolve-sub" style="font-family:'Fredoka One',cursive;font-size:18px;color:#FFE66D"></div>
   <button onclick="closeEvolve()" style="margin-top:8px;background:#FFE66D;border:none;border-radius:999px;padding:14px 36px;font-family:'Fredoka One',cursive;font-size:20px;cursor:pointer;color:#2D2D2D">계속하기 →</button>
@@ -922,176 +922,206 @@ function endCatch(){
 let _starWords=[],_si2=0,_starTotal=0,_starDone=false,_prevLv=-1;
 
 const MONSTERS=[
-  {min:0,  name:'뉴비 슬라임',    desc:'귀여운 초보 몬스터',       next:'별 5개 → 크리퍼블록으로 진화!',
-   svg:`<svg width="90" height="95" viewBox="0 0 80 90" style="animation:bob 2.5s ease-in-out infinite;overflow:visible">
-    <rect x="15" y="35" width="50" height="38" rx="4" fill="#5bc45e"/><rect x="11" y="45" width="58" height="28" rx="4" fill="#4db350"/>
-    <rect x="22" y="43" width="12" height="12" rx="2" fill="white"/><rect x="46" y="43" width="12" height="12" rx="2" fill="white"/>
-    <rect x="25" y="46" width="6" height="6" fill="#1a1a1a"/><rect x="49" y="46" width="6" height="6" fill="#1a1a1a"/>
-    <rect x="26" y="47" width="2" height="2" fill="white"/><rect x="50" y="47" width="2" height="2" fill="white"/>
-    <rect x="30" y="60" width="20" height="4" rx="2" fill="#2d7a30"/>
-    <rect x="18" y="72" width="14" height="10" rx="2" fill="#4db350"/><rect x="48" y="72" width="14" height="10" rx="2" fill="#4db350"/>
-   </svg>`},
-  {min:5,  name:'크리퍼블록',     desc:'쉿... 폭발한다!',           next:'별 10개 → 좀비 전사로 진화!',
-   svg:`<svg width="90" height="105" viewBox="0 0 80 100" style="animation:bob 2.2s ease-in-out infinite;overflow:visible">
-    <rect x="14" y="6" width="52" height="48" rx="3" fill="#4a7c3f"/>
-    <rect x="20" y="16" width="14" height="14" rx="1" fill="#1a1a1a"/><rect x="46" y="16" width="14" height="14" rx="1" fill="#1a1a1a"/>
-    <rect x="30" y="32" width="20" height="8" rx="1" fill="#1a1a1a"/>
-    <rect x="26" y="36" width="8" height="14" rx="1" fill="#1a1a1a"/><rect x="46" y="36" width="8" height="14" rx="1" fill="#1a1a1a"/>
-    <rect x="20" y="54" width="40" height="30" rx="2" fill="#5a8f4e"/>
-    <rect x="18" y="82" width="16" height="16" rx="2" fill="#4a7c3f"/><rect x="46" y="82" width="16" height="16" rx="2" fill="#4a7c3f"/>
-   </svg>`},
-  {min:10, name:'좀비 전사',      desc:'으르렁! 뇌가 필요해',       next:'별 15개 → 스켈레톤 나이트로 진화!',
-   svg:`<svg width="90" height="108" viewBox="0 0 80 105" style="animation:shake 3s ease-in-out infinite;overflow:visible">
-    <rect x="16" y="4" width="48" height="46" rx="3" fill="#7fba6e"/>
-    <rect x="22" y="14" width="14" height="14" rx="1" fill="#ff4400"/><rect x="44" y="14" width="14" height="14" rx="1" fill="#ff4400"/>
-    <rect x="25" y="17" width="8" height="8" fill="#ff8844"/><rect x="47" y="17" width="8" height="8" fill="#ff8844"/>
-    <rect x="22" y="34" width="36" height="6" rx="1" fill="#1a1a1a"/>
-    <rect x="26" y="32" width="4" height="10" rx="1" fill="#1a1a1a"/><rect x="34" y="32" width="4" height="10" rx="1" fill="#1a1a1a"/>
-    <rect x="42" y="32" width="4" height="10" rx="1" fill="#1a1a1a"/><rect x="50" y="32" width="4" height="10" rx="1" fill="#1a1a1a"/>
-    <rect x="18" y="50" width="44" height="34" rx="2" fill="#6aad58"/><rect x="18" y="50" width="44" height="10" rx="2" fill="#8B6914"/>
-    <rect x="2" y="50" width="16" height="10" rx="2" fill="#7fba6e"/>
-    <rect x="18" y="82" width="18" height="20" rx="2" fill="#6aad58"/><rect x="44" y="82" width="18" height="20" rx="2" fill="#6aad58"/>
-   </svg>`},
-  {min:15, name:'스켈레톤 나이트', desc:'영원한 어둠의 기사',        next:'별 20개 → 마그마 골렘으로 진화!',
-   svg:`<svg width="90" height="115" viewBox="0 0 85 112" style="animation:bob 1.8s ease-in-out infinite;overflow:visible">
-    <rect x="14" y="2" width="52" height="12" rx="3" fill="#999"/><rect x="16" y="8" width="48" height="44" rx="4" fill="#f0ece0"/>
-    <rect x="21" y="16" width="16" height="16" rx="2" fill="#1a1a1a"/><rect x="47" y="16" width="16" height="16" rx="2" fill="#1a1a1a"/>
-    <rect x="24" y="19" width="10" height="10" rx="1" fill="#2244cc"/><rect x="50" y="19" width="10" height="10" rx="1" fill="#2244cc"/>
-    <rect x="22" y="42" width="36" height="6" rx="1" fill="#1a1a1a"/>
-    <rect x="24" y="41" width="6" height="9" rx="1" fill="#f0ece0"/><rect x="32" y="41" width="6" height="9" rx="1" fill="#f0ece0"/>
-    <rect x="42" y="41" width="6" height="9" rx="1" fill="#f0ece0"/><rect x="52" y="41" width="6" height="9" rx="1" fill="#f0ece0"/>
-    <rect x="16" y="52" width="50" height="36" rx="3" fill="#888"/><rect x="20" y="55" width="42" height="30" rx="2" fill="#aaa"/>
-    <rect x="36" y="55" width="12" height="30" fill="#888"/><rect x="20" y="66" width="42" height="6" fill="#888"/>
-    <rect x="18" y="86" width="18" height="24" rx="2" fill="#999"/><rect x="46" y="86" width="18" height="24" rx="2" fill="#999"/>
-    <rect x="68" y="18" width="6" height="46" rx="2" fill="#ccc"/><rect x="62" y="38" width="18" height="6" rx="1" fill="#888"/>
-    <rect x="69" y="12" width="4" height="10" rx="1" fill="#f59e0b"/>
-   </svg>`},
-  {min:20,name:'마그마 골렘',    desc:'용암으로 만든 거인',         next:'별 25개 → 엔더 워커로 진화!',
-   svg:`<svg width="90" height="118" viewBox="0 0 90 115" style="animation:pulse 1.6s ease-in-out infinite;overflow:visible">
-    <rect x="14" y="46" width="62" height="54" rx="4" fill="#7c2d12"/>
-    <rect x="34" y="52" width="22" height="42" rx="2" fill="#ea580c" opacity=".6"/>
-    <rect x="38" y="48" width="14" height="50" rx="2" fill="#f97316" opacity=".5"/>
-    <rect x="18" y="60" width="14" height="4" rx="1" fill="#f97316"/><rect x="58" y="60" width="14" height="4" rx="1" fill="#f97316"/>
-    <rect x="18" y="72" width="10" height="4" rx="1" fill="#fb923c"/><rect x="62" y="74" width="10" height="4" rx="1" fill="#fb923c"/>
-    <rect x="18" y="8" width="54" height="44" rx="4" fill="#92400e"/>
-    <rect x="24" y="18" width="18" height="14" rx="2" fill="#1a1a1a"/><rect x="48" y="18" width="18" height="14" rx="2" fill="#1a1a1a"/>
-    <rect x="26" y="20" width="14" height="10" rx="1" fill="#f97316"/><rect x="50" y="20" width="14" height="10" rx="1" fill="#f97316"/>
-    <rect x="28" y="22" width="10" height="6" fill="#fbbf24"/><rect x="52" y="22" width="10" height="6" fill="#fbbf24"/>
-    <rect x="24" y="38" width="42" height="10" rx="2" fill="#1a1a1a"/>
-    <rect x="26" y="40" width="6" height="8" rx="1" fill="#f97316"/><rect x="36" y="40" width="6" height="8" rx="1" fill="#f97316"/>
-    <rect x="46" y="40" width="6" height="8" rx="1" fill="#f97316"/><rect x="56" y="40" width="6" height="8" rx="1" fill="#f97316"/>
-    <rect x="0" y="50" width="14" height="40" rx="3" fill="#92400e"/><rect x="76" y="50" width="14" height="40" rx="3" fill="#92400e"/>
-    <rect x="0" y="86" width="18" height="16" rx="3" fill="#7c2d12"/><rect x="72" y="86" width="18" height="16" rx="3" fill="#7c2d12"/>
-    <rect x="16" y="98" width="22" height="16" rx="3" fill="#7c2d12"/><rect x="52" y="98" width="22" height="16" rx="3" fill="#7c2d12"/>
-   </svg>`},
-  {min:25,name:'엔더 워커',      desc:'차원을 넘나드는 자',         next:'별 30개 → 위더 킹으로 진화!',
-   svg:`<svg width="90" height="125" viewBox="0 0 80 120" style="animation:glw 1.5s ease-in-out infinite;overflow:visible">
-    <style>@keyframes glw{0%,100%{opacity:1}50%{opacity:.55}}</style>
-    <rect x="24" y="34" width="32" height="58" rx="3" fill="#1a0a2e"/>
-    <rect x="12" y="4" width="56" height="50" rx="3" fill="#0d0020"/>
-    <rect x="16" y="16" width="20" height="12" rx="2" fill="#9333ea"/><rect x="44" y="16" width="20" height="12" rx="2" fill="#9333ea"/>
-    <rect x="18" y="18" width="16" height="8" rx="1" fill="#c084fc"/><rect x="46" y="18" width="16" height="8" rx="1" fill="#c084fc"/>
-    <rect x="20" y="20" width="12" height="4" fill="white" opacity=".7"/><rect x="48" y="20" width="12" height="4" fill="white" opacity=".7"/>
-    <rect x="20" y="36" width="40" height="14" rx="2" fill="#6b21a8"/><rect x="22" y="38" width="36" height="10" rx="1" fill="#0d0020"/>
-    <rect x="6" y="14" width="5" height="5" rx="1" fill="#9333ea" opacity=".8"/>
-    <rect x="70" y="22" width="4" height="4" rx="1" fill="#c084fc" opacity=".6"/>
-    <rect x="2" y="54" width="22" height="8" rx="2" fill="#1a0a2e"/><rect x="56" y="54" width="22" height="8" rx="2" fill="#1a0a2e"/>
-    <rect x="0" y="60" width="10" height="28" rx="2" fill="#0d0020"/><rect x="70" y="60" width="10" height="28" rx="2" fill="#0d0020"/>
-    <rect x="24" y="90" width="14" height="30" rx="2" fill="#0d0020"/><rect x="42" y="90" width="14" height="30" rx="2" fill="#0d0020"/>
-    <rect x="10" y="2" width="60" height="54" rx="6" fill="none" stroke="#9333ea" stroke-width="2" opacity=".4"/>
-   </svg>`},
-  {min:30,name:'위더 킹',        desc:'세 머리의 어둠의 왕',        next:'별 35개 → 아이언 타이탄으로 진화!',
-   svg:`<svg width="100" height="125" viewBox="0 0 100 120" style="animation:shake 2s ease-in-out infinite;overflow:visible">
-    <rect x="2" y="10" width="28" height="24" rx="3" fill="#2d2d3d"/>
-    <rect x="6" y="15" width="8" height="8" rx="1" fill="#60a5fa"/><rect x="18" y="15" width="8" height="8" rx="1" fill="#60a5fa"/>
-    <rect x="7" y="17" width="6" height="4" fill="#93c5fd"/><rect x="19" y="17" width="6" height="4" fill="#93c5fd"/>
-    <rect x="6" y="26" width="20" height="5" rx="1" fill="#1a1a2e"/>
-    <rect x="34" y="2" width="32" height="28" rx="3" fill="#1a1a2e"/>
-    <rect x="38" y="9" width="10" height="10" rx="1" fill="#818cf8"/><rect x="52" y="9" width="10" height="10" rx="1" fill="#818cf8"/>
-    <rect x="39" y="11" width="8" height="6" fill="#c7d2fe"/><rect x="53" y="11" width="8" height="6" fill="#c7d2fe"/>
-    <rect x="38" y="22" width="24" height="5" rx="1" fill="#0f0f1a"/>
-    <rect x="40" y="21" width="4" height="8" rx="1" fill="#e2e8f0"/><rect x="46" y="21" width="4" height="8" rx="1" fill="#e2e8f0"/>
-    <rect x="52" y="21" width="4" height="8" rx="1" fill="#e2e8f0"/>
-    <rect x="70" y="10" width="28" height="24" rx="3" fill="#2d2d3d"/>
-    <rect x="74" y="15" width="8" height="8" rx="1" fill="#60a5fa"/><rect x="86" y="15" width="8" height="8" rx="1" fill="#60a5fa"/>
-    <rect x="75" y="17" width="6" height="4" fill="#93c5fd"/><rect x="87" y="17" width="6" height="4" fill="#93c5fd"/>
-    <rect x="74" y="26" width="20" height="5" rx="1" fill="#1a1a2e"/>
-    <rect x="28" y="30" width="44" height="52" rx="4" fill="#1a1a2e"/>
-    <rect x="32" y="38" width="36" height="4" rx="1" fill="#2d2d3d"/><rect x="32" y="46" width="36" height="4" rx="1" fill="#2d2d3d"/>
-    <rect x="32" y="54" width="36" height="4" rx="1" fill="#2d2d3d"/><rect x="32" y="62" width="36" height="4" rx="1" fill="#2d2d3d"/>
-    <rect x="46" y="30" width="8" height="52" rx="2" fill="#4f46e5" opacity=".4"/>
-    <rect x="8" y="34" width="20" height="8" rx="2" fill="#2d2d3d"/><rect x="72" y="34" width="20" height="8" rx="2" fill="#2d2d3d"/>
-    <rect x="4" y="40" width="8" height="30" rx="2" fill="#1a1a2e"/><rect x="88" y="40" width="8" height="30" rx="2" fill="#1a1a2e"/>
-    <rect x="30" y="80" width="16" height="34" rx="2" fill="#2d2d3d"/><rect x="54" y="80" width="16" height="34" rx="2" fill="#2d2d3d"/>
-    <rect x="26" y="28" width="48" height="56" rx="6" fill="none" stroke="#818cf8" stroke-width="2" opacity=".4"/>
-   </svg>`},
-  {min:35,name:'아이언 타이탄',   desc:'강철 거인 전사',             next:'별 40개 → 네더 피글린으로 진화!',
-   svg:`<svg width="95" height="122" viewBox="0 0 95 120" style="animation:pulse 2s ease-in-out infinite;overflow:visible">
-    <rect x="18" y="42" width="59" height="60" rx="5" fill="#374151"/><rect x="22" y="46" width="51" height="52" rx="4" fill="#4b5563"/>
-    <rect x="30" y="50" width="35" height="44" rx="3" fill="#6b7280"/>
-    <rect x="22" y="50" width="6" height="6" rx="3" fill="#9ca3af"/><rect x="67" y="50" width="6" height="6" rx="3" fill="#9ca3af"/>
-    <rect x="22" y="90" width="6" height="6" rx="3" fill="#9ca3af"/><rect x="67" y="90" width="6" height="6" rx="3" fill="#9ca3af"/>
-    <rect x="36" y="56" width="23" height="16" rx="8" fill="#22d3ee" opacity=".8"/>
-    <rect x="40" y="60" width="15" height="8" rx="4" fill="white" opacity=".9"/>
-    <rect x="32" y="76" width="6" height="12" rx="2" fill="#374151"/><rect x="40" y="76" width="6" height="12" rx="2" fill="#374151"/>
-    <rect x="48" y="76" width="6" height="12" rx="2" fill="#374151"/><rect x="56" y="76" width="6" height="12" rx="2" fill="#374151"/>
-    <rect x="16" y="6" width="63" height="42" rx="5" fill="#374151"/><rect x="20" y="10" width="55" height="34" rx="4" fill="#4b5563"/>
-    <rect x="22" y="16" width="51" height="16" rx="4" fill="#1a1a1a"/>
-    <rect x="24" y="18" width="47" height="12" rx="3" fill="#22d3ee" opacity=".7"/>
-    <rect x="26" y="20" width="43" height="8" rx="2" fill="white" opacity=".5"/>
-    <rect x="24" y="36" width="8" height="8" rx="1" fill="#374151"/><rect x="34" y="36" width="8" height="8" rx="1" fill="#374151"/>
-    <rect x="44" y="36" width="8" height="8" rx="1" fill="#374151"/><rect x="54" y="36" width="8" height="8" rx="1" fill="#374151"/>
-    <rect x="64" y="36" width="8" height="8" rx="1" fill="#374151"/>
-    <rect x="0" y="46" width="18" height="46" rx="4" fill="#4b5563"/><rect x="77" y="46" width="18" height="46" rx="4" fill="#4b5563"/>
-    <rect x="0" y="88" width="22" height="18" rx="4" fill="#374151"/><rect x="73" y="88" width="22" height="18" rx="4" fill="#374151"/>
-    <rect x="20" y="100" width="22" height="18" rx="3" fill="#374151"/><rect x="53" y="100" width="22" height="18" rx="3" fill="#374151"/>
-   </svg>`},
-  {min:40,name:'네더 피글린',     desc:'황금 갑옷의 돼지 전사',      next:'별 45개 → 엔더 드래곤으로 진화!',
-   svg:`<svg width="90" height="120" viewBox="0 0 90 118" style="animation:bob 1.6s ease-in-out infinite;overflow:visible">
-    <rect x="18" y="2" width="54" height="12" rx="2" fill="#f59e0b"/>
-    <rect x="22" y="0" width="8" height="10" rx="1" fill="#fbbf24"/><rect x="36" y="0" width="8" height="12" rx="1" fill="#fcd34d"/>
-    <rect x="50" y="0" width="8" height="12" rx="1" fill="#fbbf24"/><rect x="64" y="0" width="6" height="10" rx="1" fill="#fbbf24"/>
-    <rect x="16" y="10" width="58" height="50" rx="4" fill="#f9a8d4"/>
-    <rect x="26" y="42" width="38" height="14" rx="6" fill="#fbb6ce"/>
-    <rect x="32" y="46" width="8" height="6" rx="3" fill="#be185d"/><rect x="50" y="46" width="8" height="6" rx="3" fill="#be185d"/>
-    <rect x="22" y="18" width="18" height="18" rx="2" fill="#1a1a1a"/><rect x="50" y="18" width="18" height="18" rx="2" fill="#1a1a1a"/>
-    <rect x="24" y="20" width="14" height="14" rx="1" fill="#dc2626"/><rect x="52" y="20" width="14" height="14" rx="1" fill="#dc2626"/>
-    <rect x="26" y="22" width="8" height="8" fill="#ef4444"/><rect x="54" y="22" width="8" height="8" fill="#ef4444"/>
-    <rect x="26" y="22" width="4" height="4" fill="white" opacity=".6"/><rect x="54" y="22" width="4" height="4" fill="white" opacity=".6"/>
-    <rect x="18" y="60" width="54" height="38" rx="3" fill="#d97706"/><rect x="22" y="64" width="46" height="30" rx="2" fill="#f59e0b"/>
-    <rect x="36" y="64" width="18" height="30" fill="#d97706"/><rect x="22" y="76" width="46" height="6" fill="#d97706"/>
-    <rect x="70" y="30" width="6" height="42" rx="2" fill="#fcd34d"/>
-    <rect x="64" y="50" width="18" height="6" rx="1" fill="#d97706"/><rect x="71" y="24" width="4" height="10" rx="1" fill="#f59e0b"/>
-    <rect x="20" y="96" width="20" height="20" rx="3" fill="#b45309"/><rect x="50" y="96" width="20" height="20" rx="3" fill="#b45309"/>
-    <rect x="18" y="108" width="24" height="10" rx="2" fill="#d97706"/><rect x="48" y="108" width="24" height="10" rx="2" fill="#d97706"/>
-   </svg>`},
-  {min:45,name:'엔더 드래곤',     desc:'전설의 최강 보스!',          next:'최고 단계 달성! 👑 전설의 몬스터!',
-   svg:`<svg width="110" height="125" viewBox="0 0 100 122" style="animation:pulse 1.2s ease-in-out infinite;overflow:visible">
-    <polygon points="2,38 28,58 18,88 0,93" fill="#1a0a2e"/>
-    <polygon points="98,38 72,58 82,88 100,93" fill="#1a0a2e"/>
-    <line x1="2" y1="38" x2="18" y2="88" stroke="#9333ea" stroke-width="1" opacity=".5"/>
-    <line x1="98" y1="38" x2="82" y2="88" stroke="#9333ea" stroke-width="1" opacity=".5"/>
-    <rect x="36" y="26" width="28" height="20" rx="4" fill="#0d0020"/>
-    <rect x="20" y="44" width="60" height="54" rx="6" fill="#0d0020"/>
-    <rect x="26" y="50" width="10" height="8" rx="2" fill="#1a0a2e"/><rect x="40" y="50" width="10" height="8" rx="2" fill="#1a0a2e"/>
-    <rect x="54" y="50" width="10" height="8" rx="2" fill="#1a0a2e"/><rect x="68" y="50" width="8" height="8" rx="2" fill="#1a0a2e"/>
-    <rect x="32" y="62" width="10" height="8" rx="2" fill="#1a0a2e"/><rect x="46" y="62" width="10" height="8" rx="2" fill="#1a0a2e"/>
-    <rect x="60" y="62" width="10" height="8" rx="2" fill="#1a0a2e"/>
-    <rect x="22" y="2" width="56" height="48" rx="5" fill="#0d0020"/>
-    <polygon points="28,2 34,2 31,12" fill="#9333ea"/><polygon points="40,2 48,2 44,14" fill="#7c3aed"/>
-    <polygon points="58,2 66,2 62,14" fill="#7c3aed"/><polygon points="72,2 78,2 75,12" fill="#9333ea"/>
-    <rect x="26" y="14" width="18" height="14" rx="2" fill="#9333ea"/><rect x="62" y="14" width="18" height="14" rx="2" fill="#9333ea"/>
-    <rect x="28" y="16" width="14" height="10" rx="1" fill="#c084fc"/><rect x="64" y="16" width="14" height="10" rx="1" fill="#c084fc"/>
-    <rect x="30" y="18" width="10" height="6" fill="white" opacity=".9"/><rect x="66" y="18" width="10" height="6" fill="white" opacity=".9"/>
-    <rect x="36" y="32" width="8" height="6" rx="2" fill="#6b21a8"/><rect x="60" y="32" width="8" height="6" rx="2" fill="#6b21a8"/>
-    <rect x="26" y="42" width="52" height="6" rx="1" fill="#6b21a8"/>
-    <rect x="28" y="40" width="6" height="10" rx="1" fill="white"/><rect x="38" y="40" width="6" height="10" rx="1" fill="white"/>
-    <rect x="56" y="40" width="6" height="10" rx="1" fill="white"/><rect x="66" y="40" width="6" height="10" rx="1" fill="white"/>
-    <rect x="24" y="96" width="20" height="20" rx="3" fill="#1a0a2e"/><rect x="60" y="96" width="20" height="20" rx="3" fill="#1a0a2e"/>
-    <polygon points="24,114 28,122 32,114" fill="#7c3aed"/><polygon points="32,114 36,122 40,114" fill="#7c3aed"/>
-    <polygon points="60,114 64,122 68,114" fill="#7c3aed"/><polygon points="68,114 72,122 76,114" fill="#7c3aed"/>
-    <rect x="18" y="0" width="64" height="52" rx="8" fill="none" stroke="#9333ea" stroke-width="2.5" opacity=".5"/>
-   </svg>`},
+  {min:0, name:'프리저', desc:'Articuno · ice/flying', next:'별 10개 → 썬더으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/144.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="프리저">`},
+  {min:10, name:'썬더', desc:'Zapdos · electric/flying', next:'별 20개 → 파이어으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/145.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="썬더">`},
+  {min:20, name:'파이어', desc:'Moltres · fire/flying', next:'별 30개 → 뮤츠으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/146.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="파이어">`},
+  {min:30, name:'뮤츠', desc:'Mewtwo · psychic', next:'별 40개 → 뮤으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="뮤츠">`},
+  {min:40, name:'뮤', desc:'Mew · psychic', next:'별 50개 → 라이코으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="뮤">`},
+  {min:50, name:'라이코', desc:'Raikou · electric', next:'별 60개 → 앤테이으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/243.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="라이코">`},
+  {min:60, name:'앤테이', desc:'Entei · fire', next:'별 70개 → 스이쿤으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/244.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="앤테이">`},
+  {min:70, name:'스이쿤', desc:'Suicune · water', next:'별 80개 → 루기아으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/245.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="스이쿤">`},
+  {min:80, name:'루기아', desc:'Lugia · psychic/flying', next:'별 90개 → 칠색조으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/249.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="루기아">`},
+  {min:90, name:'칠색조', desc:'Ho-Oh · fire/flying', next:'별 100개 → 세레비으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/250.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="칠색조">`},
+  {min:100, name:'세레비', desc:'Celebi · psychic/grass', next:'별 110개 → 레지록으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/251.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="세레비">`},
+  {min:110, name:'레지록', desc:'Regirock · rock', next:'별 120개 → 레지아이스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/377.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="레지록">`},
+  {min:120, name:'레지아이스', desc:'Regice · ice', next:'별 130개 → 레지스틸으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/378.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="레지아이스">`},
+  {min:130, name:'레지스틸', desc:'Registeel · steel', next:'별 140개 → 라티아스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/379.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="레지스틸">`},
+  {min:140, name:'라티아스', desc:'Latias · dragon/psychic', next:'별 150개 → 라티오스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/380.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="라티아스">`},
+  {min:150, name:'라티오스', desc:'Latios · dragon/psychic', next:'별 160개 → 가이오가으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/381.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="라티오스">`},
+  {min:160, name:'가이오가', desc:'Kyogre · water', next:'별 170개 → 그란돈으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/382.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="가이오가">`},
+  {min:170, name:'그란돈', desc:'Groudon · ground', next:'별 180개 → 레쿠쟈으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/383.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="그란돈">`},
+  {min:180, name:'레쿠쟈', desc:'Rayquaza · dragon/flying', next:'별 190개 → 지라치으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="레쿠쟈">`},
+  {min:190, name:'지라치', desc:'Jirachi · steel/psychic', next:'별 200개 → 테오키스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/385.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="지라치">`},
+  {min:200, name:'테오키스', desc:'Deoxys · psychic', next:'별 210개 → 유크시으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/386.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="테오키스">`},
+  {min:210, name:'유크시', desc:'Uxie · psychic', next:'별 220개 → 엠라이트으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/480.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="유크시">`},
+  {min:220, name:'엠라이트', desc:'Mesprit · psychic', next:'별 230개 → 아그놈으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/481.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="엠라이트">`},
+  {min:230, name:'아그놈', desc:'Azelf · psychic', next:'별 240개 → 디아루가으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/482.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="아그놈">`},
+  {min:240, name:'디아루가', desc:'Dialga · steel/dragon', next:'별 250개 → 펄기아으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/483.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="디아루가">`},
+  {min:250, name:'펄기아', desc:'Palkia · water/dragon', next:'별 260개 → 히드런으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/484.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="펄기아">`},
+  {min:260, name:'히드런', desc:'Heatran · fire/steel', next:'별 270개 → 레지기가스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/485.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="히드런">`},
+  {min:270, name:'레지기가스', desc:'Regigigas · normal', next:'별 280개 → 기라티나으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/486.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="레지기가스">`},
+  {min:280, name:'기라티나', desc:'Giratina · ghost/dragon', next:'별 290개 → 크레세리아으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/487.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="기라티나">`},
+  {min:290, name:'크레세리아', desc:'Cresselia · psychic', next:'별 300개 → 피오네으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/488.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="크레세리아">`},
+  {min:300, name:'피오네', desc:'Phione · water', next:'별 310개 → 마나피으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/489.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="피오네">`},
+  {min:310, name:'마나피', desc:'Manaphy · water', next:'별 320개 → 다크라이으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/490.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="마나피">`},
+  {min:320, name:'다크라이', desc:'Darkrai · dark', next:'별 330개 → 쉐이미으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/491.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="다크라이">`},
+  {min:330, name:'쉐이미', desc:'Shaymin · grass', next:'별 340개 → 아르세우스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/492.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="쉐이미">`},
+  {min:340, name:'아르세우스', desc:'Arceus · normal', next:'별 350개 → 비쿠티니으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/493.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="아르세우스">`},
+  {min:350, name:'비쿠티니', desc:'Victini · psychic/fire', next:'별 360개 → 코바르온으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/494.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="비쿠티니">`},
+  {min:360, name:'코바르온', desc:'Cobalion · steel/fighting', next:'별 370개 → 테라키온으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/638.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="코바르온">`},
+  {min:370, name:'테라키온', desc:'Terrakion · rock/fighting', next:'별 380개 → 비리디온으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/639.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="테라키온">`},
+  {min:380, name:'비리디온', desc:'Virizion · grass/fighting', next:'별 390개 → 토네로스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/640.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="비리디온">`},
+  {min:390, name:'토네로스', desc:'Tornadus · flying', next:'별 400개 → 볼트로스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/641.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="토네로스">`},
+  {min:400, name:'볼트로스', desc:'Thundurus · electric/flying', next:'별 410개 → 레시라무으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/642.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="볼트로스">`},
+  {min:410, name:'레시라무', desc:'Reshiram · dragon/fire', next:'별 420개 → 제크로무으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/643.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="레시라무">`},
+  {min:420, name:'제크로무', desc:'Zekrom · dragon/electric', next:'별 430개 → 란드로스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/644.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="제크로무">`},
+  {min:430, name:'란드로스', desc:'Landorus · ground/flying', next:'별 440개 → 큐레무으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/645.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="란드로스">`},
+  {min:440, name:'큐레무', desc:'Kyurem · dragon/ice', next:'별 450개 → 케르디오으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/646.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="큐레무">`},
+  {min:450, name:'케르디오', desc:'Keldeo · water/fighting', next:'별 460개 → 메로엣타으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/647.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="케르디오">`},
+  {min:460, name:'메로엣타', desc:'Meloetta · normal/psychic', next:'별 470개 → 게노세크트으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/648.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="메로엣타">`},
+  {min:470, name:'게노세크트', desc:'Genesect · bug/steel', next:'별 480개 → 제르네아스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/649.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="게노세크트">`},
+  {min:480, name:'제르네아스', desc:'Xerneas · fairy', next:'별 490개 → 이벨타르으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/716.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="제르네아스">`},
+  {min:490, name:'이벨타르', desc:'Yveltal · dark/flying', next:'별 500개 → 지가르데으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/717.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="이벨타르">`},
+  {min:500, name:'지가르데', desc:'Zygarde · dragon/ground', next:'별 510개 → 디안시으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/718.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="지가르데">`},
+  {min:510, name:'디안시', desc:'Diancie · rock/fairy', next:'별 520개 → 후파으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/719.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="디안시">`},
+  {min:520, name:'후파', desc:'Hoopa · psychic/ghost', next:'별 530개 → 볼케니온으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/720.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="후파">`},
+  {min:530, name:'볼케니온', desc:'Volcanion · fire/water', next:'별 540개 → 타입:눌으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/721.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="볼케니온">`},
+  {min:540, name:'타입:눌', desc:'Type: Null · normal', next:'별 550개 → 실버디으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/772.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="타입:눌">`},
+  {min:550, name:'실버디', desc:'Silvally · normal', next:'별 560개 → 카푸꼬꼬꼭으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/773.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="실버디">`},
+  {min:560, name:'카푸꼬꼬꼭', desc:'Tapu Koko · electric/fairy', next:'별 570개 → 카푸나비나으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/785.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="카푸꼬꼬꼭">`},
+  {min:570, name:'카푸나비나', desc:'Tapu Lele · psychic/fairy', next:'별 580개 → 카푸브루루으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/786.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="카푸나비나">`},
+  {min:580, name:'카푸브루루', desc:'Tapu Bulu · grass/fairy', next:'별 590개 → 카푸레히레으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/787.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="카푸브루루">`},
+  {min:590, name:'카푸레히레', desc:'Tapu Fini · water/fairy', next:'별 600개 → 코스모그으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/788.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="카푸레히레">`},
+  {min:600, name:'코스모그', desc:'Cosmog · psychic', next:'별 610개 → 코스모움으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/789.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="코스모그">`},
+  {min:610, name:'코스모움', desc:'Cosmoem · psychic', next:'별 620개 → 솔가레오으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/790.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="코스모움">`},
+  {min:620, name:'솔가레오', desc:'Solgaleo · psychic/steel', next:'별 630개 → 루나아라으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/791.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="솔가레오">`},
+  {min:630, name:'루나아라', desc:'Lunala · psychic/ghost', next:'별 640개 → 네크로즈마으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/792.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="루나아라">`},
+  {min:640, name:'네크로즈마', desc:'Necrozma · psychic', next:'별 650개 → 마기아나으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/800.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="네크로즈마">`},
+  {min:650, name:'마기아나', desc:'Magearna · steel/fairy', next:'별 660개 → 마샤도으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/801.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="마기아나">`},
+  {min:660, name:'마샤도', desc:'Marshadow · fighting/ghost', next:'별 670개 → 제라오라으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/802.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="마샤도">`},
+  {min:670, name:'제라오라', desc:'Zeraora · electric', next:'별 680개 → 멜탄으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/807.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="제라오라">`},
+  {min:680, name:'멜탄', desc:'Meltan · steel', next:'별 690개 → 멜메탈으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/808.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="멜탄">`},
+  {min:690, name:'멜메탈', desc:'Melmetal · steel', next:'별 700개 → 자시안으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/809.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="멜메탈">`},
+  {min:700, name:'자시안', desc:'Zacian · fairy', next:'별 710개 → 자마젠타으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/888.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="자시안">`},
+  {min:710, name:'자마젠타', desc:'Zamazenta · fighting', next:'별 720개 → 에터너투스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/889.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="자마젠타">`},
+  {min:720, name:'에터너투스', desc:'Eternatus · poison/dragon', next:'별 730개 → 우라오스(일격)으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/890.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="에터너투스">`},
+  {min:730, name:'우라오스(일격)', desc:'Urshifu · fighting/water', next:'별 740개 → 우라오스(연격)으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/891.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="우라오스(일격)">`},
+  {min:740, name:'우라오스(연격)', desc:'Urshifu · fighting/dark', next:'별 750개 → 자루드으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/892.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="우라오스(연격)">`},
+  {min:750, name:'자루드', desc:'Zarude · dark/grass', next:'별 760개 → 레지에레키으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/893.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="자루드">`},
+  {min:760, name:'레지에레키', desc:'Regieleki · electric', next:'별 770개 → 레지드래고으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/894.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="레지에레키">`},
+  {min:770, name:'레지드래고', desc:'Regidrago · dragon', next:'별 780개 → 블리자포스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/895.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="레지드래고">`},
+  {min:780, name:'블리자포스', desc:'Glastrier · ice', next:'별 790개 → 스펙트리어으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/896.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="블리자포스">`},
+  {min:790, name:'스펙트리어', desc:'Spectrier · ghost', next:'별 800개 → 칼리라무으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/897.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="스펙트리어">`},
+  {min:800, name:'칼리라무', desc:'Calyrex · psychic/grass', next:'별 810개 → 에나무스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/898.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="칼리라무">`},
+  {min:810, name:'에나무스', desc:'Enamorus · fairy/flying', next:'별 820개 → 웨인스팬으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/905.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="에나무스">`},
+  {min:820, name:'웨인스팬', desc:'Wo-Chien · dark/grass', next:'별 830개 → 치엔파오으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1001.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="웨인스팬">`},
+  {min:830, name:'치엔파오', desc:'Chien-Pao · dark/ice', next:'별 840개 → 팅루으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1002.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="치엔파오">`},
+  {min:840, name:'팅루', desc:'Ting-Lu · dark/ground', next:'별 850개 → 치유렘으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1003.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="팅루">`},
+  {min:850, name:'치유렘', desc:'Chi-Yu · dark/fire', next:'별 860개 → 로아링문으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1004.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="치유렘">`},
+  {min:860, name:'로아링문', desc:'Roaring Moon · dragon/dark', next:'별 870개 → 아이언발리언트으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1005.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="로아링문">`},
+  {min:870, name:'아이언발리언트', desc:'Iron Valiant · fairy/fighting', next:'별 880개 → 코라이돈으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1006.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="아이언발리언트">`},
+  {min:880, name:'코라이돈', desc:'Koraidon · fighting/dragon', next:'별 890개 → 미라이돈으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1007.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="코라이돈">`},
+  {min:890, name:'미라이돈', desc:'Miraidon · electric/dragon', next:'별 900개 → 구징파이어으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1008.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="미라이돈">`},
+  {min:900, name:'구징파이어', desc:'Gouging Fire · fire/dragon', next:'별 910개 → 아이언볼더으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1009.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="구징파이어">`},
+  {min:910, name:'아이언볼더', desc:'Iron Boulder · rock/psychic', next:'별 920개 → 아이언크라운으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1010.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="아이언볼더">`},
+  {min:920, name:'아이언크라운', desc:'Iron Crown · steel/psychic', next:'별 930개 → 오거폰으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1011.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="아이언크라운">`},
+  {min:930, name:'오거폰', desc:'Ogerpon · grass', next:'별 940개 → 오키도기으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1014.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="오거폰">`},
+  {min:940, name:'오키도기', desc:'Okidogi · poison/fighting', next:'별 950개 → 문키도리으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1015.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.0s ease-in-out infinite" alt="오키도기">`},
+  {min:950, name:'문키도리', desc:'Munkidori · poison/psychic', next:'별 960개 → 페잔디피티으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1016.png" style="width:96px;height:96px;image-rendering:pixelated;animation:glw 1.5s ease-in-out infinite" alt="문키도리">`},
+  {min:960, name:'페잔디피티', desc:'Fezandipiti · poison/fairy', next:'별 970개 → 워킹웨이크으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1017.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 2.5s ease-in-out infinite" alt="페잔디피티">`},
+  {min:970, name:'워킹웨이크', desc:'Walking Wake · water/dragon', next:'별 980개 → 테라파고스으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1020.png" style="width:96px;height:96px;image-rendering:pixelated;animation:pulse 1.6s ease-in-out infinite" alt="워킹웨이크">`},
+  {min:980, name:'테라파고스', desc:'Terapagos · normal', next:'별 990개 → 페로코치으로 진화!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1024.png" style="width:96px;height:96px;image-rendering:pixelated;animation:bob 1.8s ease-in-out infinite" alt="테라파고스">`},
+  {min:990, name:'페로코치', desc:'Pecharunt · poison/ghost', next:'최고 단계! 👑 전설 포켓몬 마스터!',
+   svg:`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1025.png" style="width:96px;height:96px;image-rendering:pixelated;animation:shake 3s ease-in-out infinite" alt="페로코치">`}
 ];
 
 function getCurMonster(n){
@@ -1124,7 +1154,8 @@ function updStarHud(){
   }
 }
 function showEvolve(m){
-  $('evolve-svg').innerHTML=m.svg;
+  const rawSvg=m.svg.replace(/width:\s*["']?\d+["']?/,'width="160"').replace(/height:\s*["']?\d+["']?/,'height="160"');
+  $('evolve-svg').innerHTML=rawSvg;
   $('evolve-title').textContent=`✨ ${m.name} 으로 진화! ✨`;
   $('evolve-sub').textContent=m.desc;
   $('evolve-overlay').style.display='flex';
