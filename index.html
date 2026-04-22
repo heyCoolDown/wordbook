@@ -542,10 +542,10 @@
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,doc,onSnapshot,setDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{initializeFirestore,persistentLocalCache,doc,onSnapshot,setDoc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fbApp=initializeApp({apiKey:"AIzaSyClwAIMJNCP0vmlFuXisg3t4knM_A06vH4",authDomain:"wordbook-6c22d.firebaseapp.com",projectId:"wordbook-6c22d",storageBucket:"wordbook-6c22d.firebasestorage.app",messagingSenderId:"867682537141",appId:"1:867682537141:web:b654f5118e9334a09538fc"});
-const db=getFirestore(fbApp),REF=doc(db,'wordbook','data');
+const db=initializeFirestore(fbApp,{localCache:persistentLocalCache()}),REF=doc(db,'wordbook','data');
 
 const COLORS=[{bg:'#FFE5E5',ac:'#FF6B6B',ico:'🌸'},{bg:'#E0FDF4',ac:'#4ECDC4',ico:'🌿'},{bg:'#EDE9FE',ac:'#C084FC',ico:'🦄'},{bg:'#DBEAFE',ac:'#60A5FA',ico:'⭐'},{bg:'#FEF3C7',ac:'#F59E0B',ico:'🌟'},{bg:'#FCE7F3',ac:'#EC4899',ico:'🌺'},{bg:'#ECFDF5',ac:'#10B981',ico:'🐢'},{bg:'#FFF7ED',ac:'#FB923C',ico:'🦊'}];
 const EMOJIS=['🌈','🎈','🎀','🍭','🍦','🦋','🐸','🐬','🦁','🐼','🌺','🍓','🎸','🚀','⚡','🌊','🎪','🦖','🐙','🦕'];
