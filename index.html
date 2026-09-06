@@ -1466,6 +1466,46 @@ async function getOcrWorker(){
   return _ocrWorker;
 }
 
+// Tesseract 내장 in_dictionary는 고어/희귀단어까지 다 포함돼있어서, OCR이 잘못 읽은
+// 글자조합("store"→"stour" 같은)이 우연히 사전에 진짜로 있는 단어와 일치해버리는
+// 경우를 못 거른다. 그래서 "실제로 흔히 쓰이는 영단어" 1만개 목록으로 한번 더 거른다
+// (구글 검색어 빈도 기반 공개 목록, 무료·키 불필요, 최초 스캔시 1회만 내려받아 캐시).
+let _commonWords=null;
+async function getCommonWords(){
+  if(_commonWords)return _commonWords;
+  try{
+    const res=await fetch('https://cdn.jsdelivr.net/gh/first20hours/google-10000-english/google-10000-english-no-swears.txt');
+    const text=await res.text();
+    _commonWords=new Set(text.split('\n').map(w=>w.trim().toLowerCase()).filter(Boolean));
+  }catch(e){
+    _commonWords=new Set();  // 실패해도 스캔 자체는 계속 되게(이 경우 사전 필터만 적용됨)
+  }
+  return _commonWords;
+}
+function isCommonWord(w){
+  if(!_commonWords||!_commonWords.size)return true;  // 목록을 못 받아왔으면 필터를 건너뜀
+  if(_commonWords.has(w))return true;
+  // 복수형/현재분사/과거형 등 흔한 어미를 뗀 원형도 확인
+  for(const suf of['ing','edly','es','ed','s']){
+    if(w.length>suf.length+2&&w.endsWith(suf)&&_commonWords.has(w.slice(0,-suf.length)))return true;
+  }
+  return false;
+}
+
+// 두 문자열의 편집거리(레벤슈타인 거리) — OCR이 같은 단어를 서로 다르게 오인식해서
+// 비슷한 후보 2개가 생기는 경우(예: slore/stour ← 둘 다 store의 오인식) 감지용
+function editDistance(a,b){
+  const dp=[];
+  for(let i=0;i<=a.length;i++)dp.push([i]);
+  for(let j=1;j<=b.length;j++)dp[0][j]=j;
+  for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)
+    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j-1],dp[i-1][j],dp[i][j-1]);
+  return dp[a.length][b.length];
+}
+function isNearDuplicate(en,list){
+  return list.some(w=>{const d=editDistance(en,w.en);return d<=1||(en.length>=6&&d<=2);});
+}
+
 const EN_WORD_RE=/^[A-Za-z][A-Za-z'-]*$/;   // 순수 알파벳 토큰만(숫자/발음기호 섞인 토큰 제외)
 const KO_WORD_RE=/^[가-힣]+$/;
 const MIN_CONF=50;  // Tesseract 단어별 신뢰도(0~100). in_dictionary 필터가 잡음을 대부분 걸러줘서 좀 낮춤
@@ -1478,7 +1518,7 @@ const BORING_WORDS=/^(name|date|score|unit|lesson|vocabulary|worksheet|test|quiz
 //   n./v./adj. 같은 품사 약어는 사전 단어가 아니라서 이 조건 하나로 대부분 걸러짐
 function lineToRecord(lineWords){
   const good=(lineWords||[]).filter(w=>w.confidence>=MIN_CONF && !w.is_numeric);
-  const ens=good.filter(w=>EN_WORD_RE.test(w.text)&&w.text.length>=2&&w.in_dictionary&&!BORING_WORDS.test(w.text));
+  const ens=good.filter(w=>EN_WORD_RE.test(w.text)&&w.text.length>=2&&w.in_dictionary&&!BORING_WORDS.test(w.text)&&isCommonWord(w.text.toLowerCase()));
   let en='';
   if(ens.length){
     ens.sort((a,b)=>b.text.length-a.text.length);
@@ -1503,6 +1543,7 @@ function extractWordsFromBlocks(blocks){
   for(let i=0;i<records.length;i++){
     const r=records[i];
     if(!r.en||seen.has(r.en))continue;
+    if(isNearDuplicate(r.en,out))continue;  // 같은 단어를 OCR이 다르게 오인식한 중복 후보로 판단, 건너뜀
     let ko=r.ko;
     if(!ko){
       const next=records[i+1];
@@ -1544,7 +1585,7 @@ function resetScan(){
 async function runScan(file){
   $('scan-status').textContent='🔍 사진에서 글자 읽는 중... (처음 한 번은 조금 걸려요)';
   try{
-    const worker=await getOcrWorker();
+    const [worker]=await Promise.all([getOcrWorker(),getCommonWords()]);
     const {data}=await worker.recognize(file,{},{blocks:true});
     const words=extractWordsFromBlocks(data.blocks);
     if(!words.length){
