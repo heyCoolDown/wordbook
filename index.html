@@ -9,8 +9,6 @@
   <link rel="manifest" href="manifest.json">
   <title>🌟 영어 단어 연습장</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <!-- 사진→단어 인식용 브라우저 자체 OCR(무료, 서버 전송 없음). 사용 시점(스캔화면 진입시)에만 실제 로드됨 -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js" defer></script>
   <style>
     :root{--cream:#FFFBF5;--coral:#FF6B6B;--teal:#4ECDC4;--yellow:#FFE66D;--purple:#C084FC;--green:#4ADE80;--blue:#60A5FA;--orange:#FB923C;--text:#2D2D2D;--muted:#9A9A9A;--shadow:0 8px 32px rgba(0,0,0,.09)}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -305,7 +303,7 @@
 <div class="screen" id="s-scan">
   <div class="hdr"><button class="back" id="back-scan">←</button><div class="hdr-t">📷 사진으로 추가</div></div>
   <div style="text-align:center;margin-bottom:14px">
-    <div style="font-size:13px;color:var(--muted);font-weight:700;margin-bottom:14px;line-height:1.7">단어가 적힌 종이/교재를 촬영하면 자동으로 읽어서<br>아래 목록에 쌓여요. <b>여러 장 나눠 찍어도</b> 계속 추가돼요.<br>(사진은 이 폰 브라우저 안에서만 처리돼요)</div>
+    <div style="font-size:13px;color:var(--muted);font-weight:700;margin-bottom:14px;line-height:1.7">단어가 적힌 종이/교재를 촬영하면 AI가 읽어서<br>아래 목록에 쌓여요. <b>여러 장 나눠 찍어도</b> 계속 추가돼요.<br>(사진은 분석을 위해 서버로 전송돼요)</div>
     <input type="file" accept="image/*" capture="environment" id="scan-file" style="display:none">
     <button class="add-btn" id="scan-take-btn" style="width:100%;padding:16px;font-size:18px">📷 사진 촬영 / 선택</button>
   </div>
@@ -1456,104 +1454,19 @@ function updCatchCharHud(){
   $('catch-char-prog').style.width=pct+'%';
 }
 
-/* ══ 사진으로 단어 추가 (브라우저 자체 OCR, 무료 — 서버/API키 없음) ══ */
+/* ══ 사진으로 단어 추가 (Claude Vision, 오라클 서버 중개 엔드포인트 경유) ══ */
 let _scanWords=[];      // [{en, ko}] — 인식 후 사용자가 확인/수정
-let _ocrWorker=null;
+const SCAN_API='https://kjkdash.duckdns.org/wordbook-ocr/vision';
 
-async function getOcrWorker(){
-  if(_ocrWorker)return _ocrWorker;
-  _ocrWorker=await Tesseract.createWorker(['eng','kor']);
-  return _ocrWorker;
-}
-
-// Tesseract 내장 in_dictionary는 고어/희귀단어까지 다 포함돼있어서, OCR이 잘못 읽은
-// 글자조합("store"→"stour" 같은)이 우연히 사전에 진짜로 있는 단어와 일치해버리는
-// 경우를 못 거른다. 그래서 "실제로 흔히 쓰이는 영단어" 1만개 목록으로 한번 더 거른다
-// (구글 검색어 빈도 기반 공개 목록, 무료·키 불필요, 최초 스캔시 1회만 내려받아 캐시).
-let _commonWords=null;
-async function getCommonWords(){
-  if(_commonWords)return _commonWords;
-  try{
-    const res=await fetch('https://cdn.jsdelivr.net/gh/first20hours/google-10000-english/google-10000-english-no-swears.txt');
-    const text=await res.text();
-    _commonWords=new Set(text.split('\n').map(w=>w.trim().toLowerCase()).filter(Boolean));
-  }catch(e){
-    _commonWords=new Set();  // 실패해도 스캔 자체는 계속 되게(이 경우 사전 필터만 적용됨)
-  }
-  return _commonWords;
-}
-function isCommonWord(w){
-  if(!_commonWords||!_commonWords.size)return true;  // 목록을 못 받아왔으면 필터를 건너뜀
-  if(_commonWords.has(w))return true;
-  // 복수형/현재분사/과거형 등 흔한 어미를 뗀 원형도 확인
-  for(const suf of['ing','edly','es','ed','s']){
-    if(w.length>suf.length+2&&w.endsWith(suf)&&_commonWords.has(w.slice(0,-suf.length)))return true;
-  }
-  return false;
+function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result);
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
 }
 
-// 두 문자열의 편집거리(레벤슈타인 거리) — OCR이 같은 단어를 서로 다르게 오인식해서
-// 비슷한 후보 2개가 생기는 경우(예: slore/stour ← 둘 다 store의 오인식) 감지용
-function editDistance(a,b){
-  const dp=[];
-  for(let i=0;i<=a.length;i++)dp.push([i]);
-  for(let j=1;j<=b.length;j++)dp[0][j]=j;
-  for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)
-    dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j-1],dp[i-1][j],dp[i][j-1]);
-  return dp[a.length][b.length];
-}
-function isNearDuplicate(en,list){
-  return list.some(w=>{const d=editDistance(en,w.en);return d<=1||(en.length>=6&&d<=2);});
-}
-
-const EN_WORD_RE=/^[A-Za-z][A-Za-z'-]*$/;   // 순수 알파벳 토큰만(숫자/발음기호 섞인 토큰 제외)
-const KO_WORD_RE=/^[가-힣]+$/;
-const MIN_CONF=50;  // Tesseract 단어별 신뢰도(0~100). in_dictionary 필터가 잡음을 대부분 걸러줘서 좀 낮춤
-// 워크시트에 흔한 제목성 단어 + 품사 약어(명사/동사 표시 등)는 사전엔 있을 수도 있어서 별도로 제외
-const BORING_WORDS=/^(name|date|score|unit|lesson|vocabulary|worksheet|test|quiz|page|word|meaning|answer|review|practice|class|grade|n|v|vt|vi|adj|adv|prep|conj|pron|int|pl|sing|abbr|syn|ant|etc)$/i;
-
-// 한 줄(line)에서 "영어단어" 후보와 "한글" 텍스트를 각각 뽑는다(짝짓기는 밖에서 처리).
-// - 신뢰도 낮은 단어는 후보에서 제외
-// - in_dictionary(Tesseract 내장 영어사전 등재 여부)가 true인 것만 인정 — 발음기호(IPA)나
-//   n./v./adj. 같은 품사 약어는 사전 단어가 아니라서 이 조건 하나로 대부분 걸러짐
-function lineToRecord(lineWords){
-  const good=(lineWords||[]).filter(w=>w.confidence>=MIN_CONF && !w.is_numeric);
-  const ens=good.filter(w=>EN_WORD_RE.test(w.text)&&w.text.length>=2&&w.in_dictionary&&!BORING_WORDS.test(w.text)&&isCommonWord(w.text.toLowerCase()));
-  let en='';
-  if(ens.length){
-    ens.sort((a,b)=>b.text.length-a.text.length);
-    en=ens[0].text.toLowerCase();
-  }
-  const ko=good.filter(w=>KO_WORD_RE.test(w.text)).map(w=>w.text).join(' ').trim();
-  return {en,ko};
-}
-// data.blocks(문단→줄→단어 구조, recognize시 {blocks:true}로 요청) 전체를 순서대로 훑어서
-// 단어 후보를 뽑고, "단어 줄"과 "뜻 줄"이 위/아래로 나뉜 레이아웃도 짝지어준다:
-// 영어단어는 있는데 같은 줄에 한글이 없으면, 바로 다음 줄이 한글만 있는 줄인 경우 그걸 뜻으로 붙임.
-function extractWordsFromBlocks(blocks){
-  const records=[];
-  for(const block of blocks||[]){
-    for(const para of block.paragraphs||[]){
-      for(const line of para.lines||[]){
-        records.push(lineToRecord(line.words));
-      }
-    }
-  }
-  const out=[],seen=new Set();
-  for(let i=0;i<records.length;i++){
-    const r=records[i];
-    if(!r.en||seen.has(r.en))continue;
-    if(isNearDuplicate(r.en,out))continue;  // 같은 단어를 OCR이 다르게 오인식한 중복 후보로 판단, 건너뜀
-    let ko=r.ko;
-    if(!ko){
-      const next=records[i+1];
-      if(next&&!next.en&&next.ko)ko=next.ko;
-    }
-    seen.add(r.en);
-    out.push({en:r.en,ko});
-  }
-  return out;
-}
 // 이미 모아둔 단어(_scanWords)와 중복되는 건 건너뛰고 새 단어만 합친다(여러 장 촬영 누적용)
 function mergeScanWords(newWords){
   const existing=new Set(_scanWords.map(w=>w.en));
@@ -1564,16 +1477,6 @@ function mergeScanWords(newWords){
   }
   return {added,skipped};
 }
-// 사진에 한글 뜻이 없는 단어만 무료 번역 API(MyMemory, 키 불필요)로 채움.
-async function translateFree(en){
-  try{
-    const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(en)}&langpair=en|ko`);
-    const j=await res.json();
-    const t=j&&j.responseData&&j.responseData.translatedText;
-    if(t&&!/no query text|invalid/i.test(t))return t;
-  }catch(e){}
-  return '';
-}
 
 function resetScan(){
   _scanWords=[];
@@ -1583,23 +1486,25 @@ function resetScan(){
 }
 
 async function runScan(file){
-  $('scan-status').textContent='🔍 사진에서 글자 읽는 중... (처음 한 번은 조금 걸려요)';
+  $('scan-status').textContent='🔍 AI가 사진을 읽는 중...';
   try{
-    const [worker]=await Promise.all([getOcrWorker(),getCommonWords()]);
-    const {data}=await worker.recognize(file,{},{blocks:true});
-    const words=extractWordsFromBlocks(data.blocks);
-    if(!words.length){
-      toast('😢 글자를 못 찾았어요. 더 밝고 또렷하게 다시 찍어주세요!');
+    const dataUrl=await fileToDataUrl(file);
+    const res=await fetch(SCAN_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({image:dataUrl})
+    });
+    if(!res.ok)throw new Error('server '+res.status);
+    const {words}=await res.json();
+    const clean=(words||[])
+      .map(w=>({en:(w.en||'').trim().toLowerCase(),ko:(w.ko||'').trim()}))
+      .filter(w=>w.en);
+    if(!clean.length){
+      toast('😢 단어를 못 찾았어요. 더 밝고 또렷하게 다시 찍어주세요!');
       $('scan-status').textContent=_scanWords.length?`📋 지금까지 ${_scanWords.length}개 모았어요`:'';
       return;
     }
-    for(let i=0;i<words.length;i++){
-      if(!words[i].ko){
-        $('scan-status').textContent=`📝 한글 뜻 찾는 중... (${i+1}/${words.length})`;
-        words[i].ko=await translateFree(words[i].en);
-      }
-    }
-    const {added,skipped}=mergeScanWords(words);
+    const {added,skipped}=mergeScanWords(clean);
     if(!$('scan-folder-name').value.trim())$('scan-folder-name').value=`사진 단어장 ${new Date().getMonth()+1}/${new Date().getDate()}`;
     renderScanReview();
     $('scan-status').textContent=`✅ ${added}개 새로 추가${skipped?` (이미 있던 ${skipped}개는 건너뜀)`:''} — 총 ${_scanWords.length}개. 더 찍으려면 위 버튼을 다시 눌러주세요`;
@@ -1637,14 +1542,17 @@ function renderScanReview(){
 function saveScanFolder(){
   const seen=new Set();
   const words=[];
+  let noKo=0;
   for(const w of _scanWords){
     const en=(w.en||'').trim().toLowerCase().replace(/[^a-z'-]/g,'');
     const ko=(w.ko||'').trim();
-    if(!en||!ko||seen.has(en))continue;
+    if(!en||seen.has(en))continue;
+    if(!ko){noKo++;continue;}
     seen.add(en);
     words.push({id:D.nwid++,en,ko,em:EMOJIS[Math.floor(Math.random()*EMOJIS.length)]});
   }
   if(!words.length){toast('저장할 단어가 없어요. 영어/한국어를 채워주세요 😊');return;}
+  if(noKo){toast(`⚠️ 뜻이 비어있는 ${noKo}개는 저장에서 빠졌어요. 채우고 다시 저장해주세요`);return;}
   const name=$('scan-folder-name').value.trim()||`사진 단어장 ${new Date().getMonth()+1}/${new Date().getDate()}`;
   D.folders.push({id:D.nfid++,name,ci:D.folders.length%COLORS.length,words});
   save();
