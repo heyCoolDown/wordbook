@@ -304,22 +304,17 @@
 <!-- SCAN (사진으로 단어 추가) -->
 <div class="screen" id="s-scan">
   <div class="hdr"><button class="back" id="back-scan">←</button><div class="hdr-t">📷 사진으로 추가</div></div>
-  <div id="scan-intro" style="text-align:center;margin-bottom:16px">
-    <div style="font-size:60px;margin-bottom:6px">📸</div>
-    <div style="font-size:13px;color:var(--muted);font-weight:700;margin-bottom:16px;line-height:1.7">영어 단어가 적힌 종이나 교재를 촬영하면<br>자동으로 읽어서 단어장을 만들어드려요.<br>(사진은 이 폰 브라우저 안에서만 처리돼요)</div>
+  <div style="text-align:center;margin-bottom:14px">
+    <div style="font-size:13px;color:var(--muted);font-weight:700;margin-bottom:14px;line-height:1.7">단어가 적힌 종이/교재를 촬영하면 자동으로 읽어서<br>아래 목록에 쌓여요. <b>여러 장 나눠 찍어도</b> 계속 추가돼요.<br>(사진은 이 폰 브라우저 안에서만 처리돼요)</div>
     <input type="file" accept="image/*" capture="environment" id="scan-file" style="display:none">
     <button class="add-btn" id="scan-take-btn" style="width:100%;padding:16px;font-size:18px">📷 사진 촬영 / 선택</button>
   </div>
-  <div id="scan-progress-wrap" style="display:none;text-align:center;width:100%;max-width:520px;margin:0 auto">
-    <div class="progwrap"><div class="progbar" style="width:100%"></div></div>
-    <div class="proglbl" id="scan-status">🔍 사진에서 글자 읽는 중...</div>
-  </div>
-  <div id="scan-review-wrap" style="display:none">
-    <div class="proglbl" id="scan-count" style="text-align:center"></div>
-    <div class="word-list" id="scan-review-list" style="margin-bottom:14px"></div>
-    <button class="add-folder-btn" id="scan-add-row-btn" style="margin-bottom:12px">＋ 단어 직접 추가</button>
+  <div class="proglbl" id="scan-status" style="text-align:center;min-height:18px"></div>
+  <div class="word-list" id="scan-review-list" style="margin-bottom:14px"></div>
+  <button class="add-folder-btn" id="scan-add-row-btn" style="margin-bottom:12px">＋ 단어 직접 추가</button>
+  <div id="scan-save-area" style="display:none">
     <input class="inp" id="scan-folder-name" placeholder="폴더 이름 (예: 9월6일 단어)" style="width:100%;margin-bottom:10px">
-    <button class="chkbtn" id="scan-save-btn">✨ 폴더로 저장</button>
+    <button class="chkbtn" id="scan-save-btn">✨ 폴더로 저장 (<span id="scan-save-count">0</span>개)</button>
   </div>
 </div>
 
@@ -1471,27 +1466,47 @@ async function getOcrWorker(){
   return _ocrWorker;
 }
 
-const HANGUL_RE=/[가-힣]+/g;
-const ENGWORD_RE=/[A-Za-z][A-Za-z'-]*/g;
+const EN_WORD_RE=/^[A-Za-z][A-Za-z'-]*$/;   // 순수 알파벳 토큰만(숫자/발음기호 섞인 토큰 제외)
+const KO_WORD_RE=/^[가-힣]+$/;
+const MIN_CONF=60;  // Tesseract 단어별 신뢰도(0~100). 발음기호/잡음은 대부분 이 아래로 나옴
+// 워크시트에 흔한 제목성 단어(진짜 학습단어가 아닌데 잡히기 쉬움)는 후보에서 제외
+const BORING_WORDS=/^(name|date|score|unit|lesson|vocabulary|worksheet|test|quiz|page|word|meaning|answer|review|practice|class|grade)$/i;
 
-// 한 줄에서 "영어단어 + (있으면) 한글뜻" 하나만 뽑는다. 여러 단어가 섞인 줄은
-// 가장 긴 영단어를 후보로 채택(짧은 잡음 인식 글자 배제).
-function parseOcrLine(line){
-  const ens=(line.match(ENGWORD_RE)||[]).filter(w=>w.length>=2);
+// 한 줄(line)에서 "영어단어 + (있으면) 한글뜻" 하나만 뽑는다.
+// - 신뢰도 낮은 단어(대부분 발음기호/잡음/숫자오인식)는 애초에 후보에서 제외
+// - 후보가 여럿이면 "사전에 등재된(in_dictionary) + 더 긴" 단어를 우선(OCR이 한 단어를
+//   반토막낸 조각보다 진짜 단어를 고르기 위함)
+function pickWordsFromLine(lineWords){
+  const good=(lineWords||[]).filter(w=>w.confidence>=MIN_CONF && !w.is_numeric);
+  const ens=good.filter(w=>EN_WORD_RE.test(w.text)&&w.text.length>=2&&!BORING_WORDS.test(w.text));
   if(!ens.length)return null;
-  const en=ens.sort((a,b)=>b.length-a.length)[0].toLowerCase();
-  const ko=(line.match(HANGUL_RE)||[]).join(' ').trim();
+  ens.sort((a,b)=>(b.in_dictionary?1:0)-(a.in_dictionary?1:0)||b.text.length-a.text.length);
+  const en=ens[0].text.toLowerCase();
+  const ko=good.filter(w=>KO_WORD_RE.test(w.text)).map(w=>w.text).join(' ').trim();
   return {en,ko};
 }
-function parseOcrText(text){
+// data.blocks(문단→줄→단어 구조, recognize시 {blocks:true}로 요청) 전체를 훑어서 단어 후보 추출
+function extractWordsFromBlocks(blocks){
   const out=[],seen=new Set();
-  for(let line of text.split(/\n+/)){
-    line=line.trim();
-    if(!line)continue;
-    const r=parseOcrLine(line);
-    if(r&&!seen.has(r.en)){seen.add(r.en);out.push(r);}
+  for(const block of blocks||[]){
+    for(const para of block.paragraphs||[]){
+      for(const line of para.lines||[]){
+        const r=pickWordsFromLine(line.words);
+        if(r&&!seen.has(r.en)){seen.add(r.en);out.push(r);}
+      }
+    }
   }
   return out;
+}
+// 이미 모아둔 단어(_scanWords)와 중복되는 건 건너뛰고 새 단어만 합친다(여러 장 촬영 누적용)
+function mergeScanWords(newWords){
+  const existing=new Set(_scanWords.map(w=>w.en));
+  let added=0,skipped=0;
+  for(const w of newWords){
+    if(existing.has(w.en)){skipped++;continue;}
+    existing.add(w.en);_scanWords.push(w);added++;
+  }
+  return {added,skipped};
 }
 // 사진에 한글 뜻이 없는 단어만 무료 번역 API(MyMemory, 키 불필요)로 채움.
 async function translateFree(en){
@@ -1506,24 +1521,20 @@ async function translateFree(en){
 
 function resetScan(){
   _scanWords=[];
-  $('scan-intro').style.display='block';
-  $('scan-progress-wrap').style.display='none';
-  $('scan-review-wrap').style.display='none';
+  $('scan-status').textContent='';
   $('scan-folder-name').value='';
+  renderScanReview();
 }
 
 async function runScan(file){
-  $('scan-intro').style.display='none';
-  $('scan-review-wrap').style.display='none';
-  $('scan-progress-wrap').style.display='block';
   $('scan-status').textContent='🔍 사진에서 글자 읽는 중... (처음 한 번은 조금 걸려요)';
   try{
     const worker=await getOcrWorker();
-    const {data:{text}}=await worker.recognize(file);
-    const words=parseOcrText(text);
+    const {data}=await worker.recognize(file,{},{blocks:true});
+    const words=extractWordsFromBlocks(data.blocks);
     if(!words.length){
       toast('😢 글자를 못 찾았어요. 더 밝고 또렷하게 다시 찍어주세요!');
-      resetScan();
+      $('scan-status').textContent=_scanWords.length?`📋 지금까지 ${_scanWords.length}개 모았어요`:'';
       return;
     }
     for(let i=0;i<words.length;i++){
@@ -1532,20 +1543,23 @@ async function runScan(file){
         words[i].ko=await translateFree(words[i].en);
       }
     }
-    _scanWords=words;
-    $('scan-folder-name').value=`사진 단어장 ${new Date().getMonth()+1}/${new Date().getDate()}`;
+    const {added,skipped}=mergeScanWords(words);
+    if(!$('scan-folder-name').value.trim())$('scan-folder-name').value=`사진 단어장 ${new Date().getMonth()+1}/${new Date().getDate()}`;
     renderScanReview();
-    $('scan-progress-wrap').style.display='none';
-    $('scan-review-wrap').style.display='block';
+    $('scan-status').textContent=`✅ ${added}개 새로 추가${skipped?` (이미 있던 ${skipped}개는 건너뜀)`:''} — 총 ${_scanWords.length}개. 더 찍으려면 위 버튼을 다시 눌러주세요`;
   }catch(e){
     toast('⚠️ 인식에 실패했어요. 다시 시도해주세요.');
-    resetScan();
+    $('scan-status').textContent=_scanWords.length?`📋 지금까지 ${_scanWords.length}개 모았어요`:'';
   }
 }
 
 function renderScanReview(){
-  $('scan-count').textContent=`📋 ${_scanWords.length}개 인식됨 — 틀린 부분은 고치고, 필요없는 건 지워주세요`;
   const el=$('scan-review-list');
+  if(!_scanWords.length){
+    el.innerHTML='<div class="empty"><div class="ei">📭</div><p>아직 인식된 단어가 없어요</p></div>';
+    $('scan-save-area').style.display='none';
+    return;
+  }
   el.innerHTML=_scanWords.map((w,i)=>`<div class="wrow" data-i="${i}">
       <input class="inp" style="flex:1;min-width:0" data-f="en" placeholder="영어" value="${w.en.replace(/"/g,'&quot;')}">
       <input class="inp" style="max-width:110px;min-width:0" data-f="ko" placeholder="한국어" value="${(w.ko||'').replace(/"/g,'&quot;')}">
@@ -1560,6 +1574,8 @@ function renderScanReview(){
   el.querySelectorAll('.wdel').forEach(b=>{
     b.addEventListener('click',()=>{_scanWords.splice(+b.dataset.i,1);renderScanReview();});
   });
+  $('scan-save-area').style.display='block';
+  $('scan-save-count').textContent=_scanWords.length;
 }
 
 function saveScanFolder(){
