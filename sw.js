@@ -2,7 +2,7 @@
 // 집(와이파이): Firebase에서 최신 단어 받고 기기에 저장
 // 밖(오프라인): 저장된 단어로 게임 실행
 
-const CACHE_NAME = 'wordbook-v1';
+const CACHE_NAME = 'wordbook-v2';
 
 // 앱 실행에 필요한 기본 파일들
 const APP_SHELL = [
