@@ -9,6 +9,8 @@
   <link rel="manifest" href="manifest.json">
   <title>🌟 영어 단어 연습장</title>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- 사진→단어 인식용 브라우저 자체 OCR(무료, 서버 전송 없음). 사용 시점(스캔화면 진입시)에만 실제 로드됨 -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js" defer></script>
   <style>
     :root{--cream:#FFFBF5;--coral:#FF6B6B;--teal:#4ECDC4;--yellow:#FFE66D;--purple:#C084FC;--green:#4ADE80;--blue:#60A5FA;--orange:#FB923C;--text:#2D2D2D;--muted:#9A9A9A;--shadow:0 8px 32px rgba(0,0,0,.09)}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -272,6 +274,7 @@
     <button class="hcard ce" id="btn-exam"><div class="hc-ico">📝</div><div class="hc-lbl">시험 모드</div><div class="hc-sub">전체 한번에 채점</div></button>
     <button class="hcard cd" id="btn-daily"><div class="hc-ico">📅</div><div class="hc-lbl">오늘의 단어</div><div class="hc-sub">이번 주 단어 공유</div></button>
     <button class="hcard" style="background:linear-gradient(135deg,#E0F7E9,#FFF9E0)" id="btn-game"><div class="hc-ico">🎮</div><div class="hc-lbl">게임</div><div class="hc-sub">4가지 단어 게임</div></button>
+    <button class="hcard full" style="background:linear-gradient(135deg,#E0F2FE,#F0FDFA)" id="btn-scan"><div class="hc-ico">📷</div><div class="hc-lbl">사진으로 단어 추가</div><div class="hc-sub">촬영하면 자동으로 단어장 생성</div></button>
   </div>
 </div>
 
@@ -296,6 +299,28 @@
     <button class="prev-spk" id="prev-spk-btn">🔊 발음 확인</button>
   </div>
   <div class="word-list" id="word-list"></div>
+</div>
+
+<!-- SCAN (사진으로 단어 추가) -->
+<div class="screen" id="s-scan">
+  <div class="hdr"><button class="back" id="back-scan">←</button><div class="hdr-t">📷 사진으로 추가</div></div>
+  <div id="scan-intro" style="text-align:center;margin-bottom:16px">
+    <div style="font-size:60px;margin-bottom:6px">📸</div>
+    <div style="font-size:13px;color:var(--muted);font-weight:700;margin-bottom:16px;line-height:1.7">영어 단어가 적힌 종이나 교재를 촬영하면<br>자동으로 읽어서 단어장을 만들어드려요.<br>(사진은 이 폰 브라우저 안에서만 처리돼요)</div>
+    <input type="file" accept="image/*" capture="environment" id="scan-file" style="display:none">
+    <button class="add-btn" id="scan-take-btn" style="width:100%;padding:16px;font-size:18px">📷 사진 촬영 / 선택</button>
+  </div>
+  <div id="scan-progress-wrap" style="display:none;text-align:center;width:100%;max-width:520px;margin:0 auto">
+    <div class="progwrap"><div class="progbar" style="width:100%"></div></div>
+    <div class="proglbl" id="scan-status">🔍 사진에서 글자 읽는 중...</div>
+  </div>
+  <div id="scan-review-wrap" style="display:none">
+    <div class="proglbl" id="scan-count" style="text-align:center"></div>
+    <div class="word-list" id="scan-review-list" style="margin-bottom:14px"></div>
+    <button class="add-folder-btn" id="scan-add-row-btn" style="margin-bottom:12px">＋ 단어 직접 추가</button>
+    <input class="inp" id="scan-folder-name" placeholder="폴더 이름 (예: 9월6일 단어)" style="width:100%;margin-bottom:10px">
+    <button class="chkbtn" id="scan-save-btn">✨ 폴더로 저장</button>
+  </div>
 </div>
 
 <!-- FLASHCARD -->
@@ -747,8 +772,12 @@ function setNotif(){
 function fireNotif(){const lines=_daily.length?_daily.map(w=>`${w.en} — ${w.ko} ${w.em}`).join('\n'):'단어를 추가해주세요!';if(typeof Notification!=='undefined'&&Notification.permission==='granted')new Notification('📚 오늘의 영어 단어!',{body:lines});alert('📚 오늘의 영어 단어!\n\n'+lines+'\n\n✨ 화이팅!');}
 
 function setupEvents(){
-  $('btn-folders').onclick=()=>show('folders');$('btn-flash').onclick=()=>openPicker('flash');$('btn-spell').onclick=()=>openPicker('spell');$('btn-exam').onclick=()=>openPicker('exam');$('btn-daily').onclick=()=>show('daily');$('btn-game').onclick=()=>show('game');
-  $('back-folders').onclick=()=>show('home');$('back-detail').onclick=()=>show('folders');$('back-flash').onclick=()=>show('home');$('back-spell').onclick=()=>show('home');$('back-exam').onclick=()=>show('home');$('back-daily').onclick=()=>show('home');$('back-game').onclick=()=>show('home');
+  $('btn-folders').onclick=()=>show('folders');$('btn-flash').onclick=()=>openPicker('flash');$('btn-spell').onclick=()=>openPicker('spell');$('btn-exam').onclick=()=>openPicker('exam');$('btn-daily').onclick=()=>show('daily');$('btn-game').onclick=()=>show('game');$('btn-scan').onclick=()=>{resetScan();show('scan');};
+  $('back-folders').onclick=()=>show('home');$('back-detail').onclick=()=>show('folders');$('back-flash').onclick=()=>show('home');$('back-spell').onclick=()=>show('home');$('back-exam').onclick=()=>show('home');$('back-daily').onclick=()=>show('home');$('back-game').onclick=()=>show('home');$('back-scan').onclick=()=>show('home');
+  $('scan-take-btn').onclick=()=>$('scan-file').click();
+  $('scan-file').addEventListener('change',e=>{const f=e.target.files[0];if(f)runScan(f);e.target.value='';});
+  $('scan-add-row-btn').onclick=()=>{_scanWords.push({en:'',ko:''});renderScanReview();};
+  $('scan-save-btn').onclick=saveScanFolder;
   // 게임 선택
   $('btn-g-quiz').onclick=startQuiz;$('btn-g-match').onclick=startMatch;$('btn-g-catch').onclick=startCatch;$('btn-g-star').onclick=startStar;
   $('back-quiz').onclick=()=>show('game');$('back-match').onclick=()=>show('game');
@@ -1430,6 +1459,126 @@ function updCatchCharHud(){
   $('catch-char-next').textContent=rem;
   const pct=next?Math.round((_catchTotalHits%10)/10*100):100;
   $('catch-char-prog').style.width=pct+'%';
+}
+
+/* ══ 사진으로 단어 추가 (브라우저 자체 OCR, 무료 — 서버/API키 없음) ══ */
+let _scanWords=[];      // [{en, ko}] — 인식 후 사용자가 확인/수정
+let _ocrWorker=null;
+
+async function getOcrWorker(){
+  if(_ocrWorker)return _ocrWorker;
+  _ocrWorker=await Tesseract.createWorker(['eng','kor']);
+  return _ocrWorker;
+}
+
+const HANGUL_RE=/[가-힣]+/g;
+const ENGWORD_RE=/[A-Za-z][A-Za-z'-]*/g;
+
+// 한 줄에서 "영어단어 + (있으면) 한글뜻" 하나만 뽑는다. 여러 단어가 섞인 줄은
+// 가장 긴 영단어를 후보로 채택(짧은 잡음 인식 글자 배제).
+function parseOcrLine(line){
+  const ens=(line.match(ENGWORD_RE)||[]).filter(w=>w.length>=2);
+  if(!ens.length)return null;
+  const en=ens.sort((a,b)=>b.length-a.length)[0].toLowerCase();
+  const ko=(line.match(HANGUL_RE)||[]).join(' ').trim();
+  return {en,ko};
+}
+function parseOcrText(text){
+  const out=[],seen=new Set();
+  for(let line of text.split(/\n+/)){
+    line=line.trim();
+    if(!line)continue;
+    const r=parseOcrLine(line);
+    if(r&&!seen.has(r.en)){seen.add(r.en);out.push(r);}
+  }
+  return out;
+}
+// 사진에 한글 뜻이 없는 단어만 무료 번역 API(MyMemory, 키 불필요)로 채움.
+async function translateFree(en){
+  try{
+    const res=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(en)}&langpair=en|ko`);
+    const j=await res.json();
+    const t=j&&j.responseData&&j.responseData.translatedText;
+    if(t&&!/no query text|invalid/i.test(t))return t;
+  }catch(e){}
+  return '';
+}
+
+function resetScan(){
+  _scanWords=[];
+  $('scan-intro').style.display='block';
+  $('scan-progress-wrap').style.display='none';
+  $('scan-review-wrap').style.display='none';
+  $('scan-folder-name').value='';
+}
+
+async function runScan(file){
+  $('scan-intro').style.display='none';
+  $('scan-review-wrap').style.display='none';
+  $('scan-progress-wrap').style.display='block';
+  $('scan-status').textContent='🔍 사진에서 글자 읽는 중... (처음 한 번은 조금 걸려요)';
+  try{
+    const worker=await getOcrWorker();
+    const {data:{text}}=await worker.recognize(file);
+    const words=parseOcrText(text);
+    if(!words.length){
+      toast('😢 글자를 못 찾았어요. 더 밝고 또렷하게 다시 찍어주세요!');
+      resetScan();
+      return;
+    }
+    for(let i=0;i<words.length;i++){
+      if(!words[i].ko){
+        $('scan-status').textContent=`📝 한글 뜻 찾는 중... (${i+1}/${words.length})`;
+        words[i].ko=await translateFree(words[i].en);
+      }
+    }
+    _scanWords=words;
+    $('scan-folder-name').value=`사진 단어장 ${new Date().getMonth()+1}/${new Date().getDate()}`;
+    renderScanReview();
+    $('scan-progress-wrap').style.display='none';
+    $('scan-review-wrap').style.display='block';
+  }catch(e){
+    toast('⚠️ 인식에 실패했어요. 다시 시도해주세요.');
+    resetScan();
+  }
+}
+
+function renderScanReview(){
+  $('scan-count').textContent=`📋 ${_scanWords.length}개 인식됨 — 틀린 부분은 고치고, 필요없는 건 지워주세요`;
+  const el=$('scan-review-list');
+  el.innerHTML=_scanWords.map((w,i)=>`<div class="wrow" data-i="${i}">
+      <input class="inp" style="flex:1;min-width:0" data-f="en" placeholder="영어" value="${w.en.replace(/"/g,'&quot;')}">
+      <input class="inp" style="max-width:110px;min-width:0" data-f="ko" placeholder="한국어" value="${(w.ko||'').replace(/"/g,'&quot;')}">
+      <button class="wdel" data-i="${i}">×</button>
+    </div>`).join('');
+  el.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      const i=+inp.closest('.wrow').dataset.i;
+      _scanWords[i][inp.dataset.f]=inp.value;
+    });
+  });
+  el.querySelectorAll('.wdel').forEach(b=>{
+    b.addEventListener('click',()=>{_scanWords.splice(+b.dataset.i,1);renderScanReview();});
+  });
+}
+
+function saveScanFolder(){
+  const seen=new Set();
+  const words=[];
+  for(const w of _scanWords){
+    const en=(w.en||'').trim().toLowerCase().replace(/[^a-z'-]/g,'');
+    const ko=(w.ko||'').trim();
+    if(!en||!ko||seen.has(en))continue;
+    seen.add(en);
+    words.push({id:D.nwid++,en,ko,em:EMOJIS[Math.floor(Math.random()*EMOJIS.length)]});
+  }
+  if(!words.length){toast('저장할 단어가 없어요. 영어/한국어를 채워주세요 😊');return;}
+  const name=$('scan-folder-name').value.trim()||`사진 단어장 ${new Date().getMonth()+1}/${new Date().getDate()}`;
+  D.folders.push({id:D.nfid++,name,ci:D.folders.length%COLORS.length,words});
+  save();
+  toast(`✨ "${name}" 폴더에 ${words.length}개 저장했어요!`);
+  resetScan();
+  show('folders');
 }
 
 init();
